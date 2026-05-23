@@ -1,0 +1,268 @@
+{
+  "6": {
+    "inputs": {
+      "text": "A cinematic long-lens wide still looks down a narrow ruined harbor street where two small distant villagers whisper the fearful warning that only fools defy the\n waves. Foreground: an empty rain-slick cobblestone street dominates the lower frame; puddles reflect the cold sky, and the space is filled with frayed rope coils,\n soaked nets, torn canvas scraps, cork floats, loose dark planks, broken plain shutter boards, seaweed, and splintered timbers. Midground: blank unmarked wet stone\n walls and plain dark wooden shutters lean inward on both sides; rough balconies sag; the overhead space is filled only with sagging rope lines, torn canvas strips,\n and simple amber oil lamps behind salt-stained glass. Farther down the street, under one crooked wooden awning, two small villagers stand half-hidden in shadow: a\n small adult man with masculine presentation in a dark wool cap, rough brown cloak, patched trousers, worn boots, and a short scruffy beard cups one hand to his\n mouth as he whispers; a small adult woman with feminine presentation in a dark hooded shawl, long gray skirt, and worn boots bends close to listen, clutching her\n shawl with tense shoulders. Background: the street funnels to a violent storm sea at the far end, storm-black water and tall white surf smashing against the quay\n and throwing foam into rain haze. The old pre-electric, 19th-century-inspired maritime fantasy world is built only from wet stone, dark hand-built wood, brass,\n rope, canvas, cork, iron, nets, candles, oil lamps, rainwater, and seaweed. Every wall, board, shutter, awning, and lamp surface is blank, plain, weathered, and\n unmarked; cold blue-gray rain, amber lamp pinpricks, and the distant roar of the surf make the street feel hushed, ruined, and afraid.",
+      "clip": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Positive Prompt)"
+    }
+  },
+  "9": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "41",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "33": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "43",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Negative Prompt)"
+    }
+  },
+  "41": {
+    "inputs": {
+      "upscale_by": 1.5,
+      "seed": 893284390308847,
+      "steps": 3,
+      "cfg": 1,
+      "sampler_name": "euler_ancestral",
+      "scheduler": "simple",
+      "denoise": 0.3,
+      "mode_type": "Linear",
+      "tile_width": 1280,
+      "tile_height": 768,
+      "mask_blur": 8,
+      "tile_padding": 336,
+      "seam_fix_mode": "None",
+      "seam_fix_denoise": 1,
+      "seam_fix_width": 64,
+      "seam_fix_mask_blur": 8,
+      "seam_fix_padding": 16,
+      "force_uniform_tiles": true,
+      "tiled_decode": false,
+      "batch_size": 1,
+      "image": [
+        "152",
+        0
+      ],
+      "model": [
+        "43",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "33",
+        0
+      ],
+      "vae": [
+        "144",
+        0
+      ],
+      "upscale_model": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "UltimateSDUpscale",
+    "_meta": {
+      "title": "Ultimate SD Upscale"
+    }
+  },
+  "42": {
+    "inputs": {
+      "model_name": "2x_Pooh_V4_Candidate_2_422k.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Load Upscale Model"
+    }
+  },
+  "43": {
+    "inputs": {
+      "lora_name": "flux/klein_slider_comic.safetensors",
+      "strength_model": 5,
+      "strength_clip": 1,
+      "model": [
+        "143",
+        0
+      ],
+      "clip": [
+        "142",
+        0
+      ]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA (Model and CLIP)"
+    }
+  },
+  "142": {
+    "inputs": {
+      "clip_name": "qwen_3_8b_fp8mixed.safetensors",
+      "type": "flux2",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "143": {
+    "inputs": {
+      "unet_name": "flux2Klein9bFp8_fp8.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
+    }
+  },
+  "144": {
+    "inputs": {
+      "vae_name": "flux2-vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "145": {
+    "inputs": {
+      "noise_seed": [
+        "151",
+        0
+      ]
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "146": {
+    "inputs": {
+      "sampler_name": "euler_ancestral"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "147": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "43",
+        0
+      ],
+      "positive": [
+        "6",
+        0
+      ],
+      "negative": [
+        "33",
+        0
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFGGuider"
+    }
+  },
+  "148": {
+    "inputs": {
+      "steps": 8,
+      "width": 1280,
+      "height": 768
+    },
+    "class_type": "Flux2Scheduler",
+    "_meta": {
+      "title": "Flux2Scheduler"
+    }
+  },
+  "149": {
+    "inputs": {
+      "width": 1280,
+      "height": 768,
+      "batch_size": 1
+    },
+    "class_type": "EmptyFlux2LatentImage",
+    "_meta": {
+      "title": "Empty Flux 2 Latent"
+    }
+  },
+  "150": {
+    "inputs": {
+      "noise": [
+        "145",
+        0
+      ],
+      "guider": [
+        "147",
+        0
+      ],
+      "sampler": [
+        "146",
+        0
+      ],
+      "sigmas": [
+        "148",
+        0
+      ],
+      "latent_image": [
+        "149",
+        0
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "151": {
+    "inputs": {
+      "seed": 662256301587325
+    },
+    "class_type": "Seed (rgthree)",
+    "_meta": {
+      "title": "Seed (rgthree)"
+    }
+  },
+  "152": {
+    "inputs": {
+      "samples": [
+        "150",
+        0
+      ],
+      "vae": [
+        "144",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  }
+}

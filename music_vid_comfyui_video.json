@@ -1,0 +1,1069 @@
+{
+  "2196": {
+    "inputs": {
+      "frame_rate": [
+        "2277:2506",
+        0
+      ],
+      "loop_count": 0,
+      "filename_prefix": "video/2026-05-15/230441-LTX23",
+      "format": "video/h265-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 20,
+      "save_metadata": true,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "2277:3164",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "Video Combine 🎥🅥🅗🅢"
+    }
+  },
+  "2197": {
+    "inputs": {
+      "image": "example.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "First-Frame-Image"
+    }
+  },
+  "2205": {
+    "inputs": {
+      "PowerLoraLoaderHeaderWidget": {
+        "type": "PowerLoraLoaderHeaderWidget"
+      },
+      "➕ Add Lora": "",
+      "model": [
+        "3306",
+        0
+      ],
+      "clip": [
+        "2277:2872",
+        2
+      ]
+    },
+    "class_type": "Power Lora Loader (rgthree)",
+    "_meta": {
+      "title": "Loras"
+    }
+  },
+  "2641": {
+    "inputs": {
+      "value": [
+        "3307",
+        0
+      ]
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Positive prompt"
+    }
+  },
+  "3200": {
+    "inputs": {
+      "value": "low quality, worst quality, blurry, flicker, jitter, stutter, shaky frame, warping, morphing, melting, ghosting, temporal artifacts, frame tearing, compression artifacts, bad anatomy, deformed body, extra limbs, missing limbs, bad hands, extra fingers, fused fingers, distorted face, identity shift, gender swap, character morphing, costume changing, inconsistent clothing, duplicate character, extra people, text, captions, subtitles, letters, signature, logo, watermark, modern clothing, guns, vehicles, glowing swords, ugly, unattractive face, grotesque face, bad face, forked sword, trident, spear, polearm, staff weapon, multiple dragons, extra dragons, dragon touching person, dragon wings on person, large breast, huge breast"
+    },
+    "class_type": "PrimitiveStringMultiline",
+    "_meta": {
+      "title": "Video negative prompt"
+    }
+  },
+  "3305": {
+    "inputs": {
+      "text": "A man lifts his sword into the error as lighting hits his sword. The man is yelling to the sky."
+    },
+    "class_type": "ttN text",
+    "_meta": {
+      "title": "video_prompt"
+    }
+  },
+  "3306": {
+    "inputs": {
+      "lora_name": "ltx/SmoothMix_Animations_LTX2.safetensors",
+      "strength_model": 1,
+      "model": [
+        "2277:2300",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "LTX SmoothMix Animation LoRA"
+    }
+  },
+  "3307": {
+    "inputs": {
+      "a": "smoothmixanime, anime style, ",
+      "b": [
+        "3305",
+        0
+      ]
+    },
+    "class_type": "JWStringConcat",
+    "_meta": {
+      "title": "SmoothMix anime positive prompt prefix"
+    }
+  },
+  "2277:2506": {
+    "inputs": {
+      "value": 24
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "Video FPS"
+    }
+  },
+  "2277:3164": {
+    "inputs": {
+      "switch": [
+        "2277:3165",
+        0
+      ],
+      "on_false": [
+        "2277:3166",
+        0
+      ],
+      "on_true": [
+        "2277:3167",
+        0
+      ]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Switch VAE"
+    }
+  },
+  "2277:3165": {
+    "inputs": {
+      "value": false
+    },
+    "class_type": "PrimitiveBoolean",
+    "_meta": {
+      "title": "Tiled VAE"
+    }
+  },
+  "2277:3166": {
+    "inputs": {
+      "samples": [
+        "2277:3255",
+        2
+      ],
+      "vae": [
+        "2277:4",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "2277:3255": {
+    "inputs": {
+      "positive": [
+        "2277:3042",
+        4
+      ],
+      "negative": [
+        "2277:3043",
+        5
+      ],
+      "latent": [
+        "2277:2727",
+        1
+      ]
+    },
+    "class_type": "LTXVCropGuides",
+    "_meta": {
+      "title": "LTXVCropGuides"
+    }
+  },
+  "2277:3042": {
+    "inputs": {
+      "ctx_01": [
+        "2277:3036",
+        0
+      ],
+      "ctx_02": [
+        "2277:3037",
+        0
+      ],
+      "ctx_03": [
+        "2277:3038",
+        0
+      ],
+      "ctx_04": [
+        "2277:3063",
+        0
+      ],
+      "ctx_05": [
+        "2277:3128",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "Context Switch (rgthree)"
+    }
+  },
+  "2277:3036": {
+    "inputs": {
+      "positive": [
+        "2277:3028",
+        0
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3028": {
+    "inputs": {
+      "num_guides": "1",
+      "num_guides.frame_idx_1": 0,
+      "num_guides.strength_1": [
+        "2277:2867",
+        0
+      ],
+      "positive": [
+        "2277:2638",
+        0
+      ],
+      "negative": [
+        "2277:2643",
+        0
+      ],
+      "vae": [
+        "2277:4",
+        0
+      ],
+      "latent": [
+        "2277:2811",
+        0
+      ],
+      "num_guides.image_1": [
+        "2277:2815",
+        0
+      ]
+    },
+    "class_type": "LTXVAddGuideMulti",
+    "_meta": {
+      "title": "LTXVAddGuideMulti"
+    }
+  },
+  "2277:2867": {
+    "inputs": {
+      "value": 0.8
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "Image strength"
+    }
+  },
+  "2277:2638": {
+    "inputs": {
+      "text": [
+        "2277:3192",
+        0
+      ],
+      "clip": [
+        "2205",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "2277:3192": {
+    "inputs": {
+      "switch": false,
+      "on_false": [
+        "2641",
+        0
+      ],
+      "on_true": [
+        "2205",
+        1
+      ]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "Switch"
+    }
+  },
+  "2277:2300": {
+    "inputs": {
+      "enable_fp16_accumulation": true,
+      "model": [
+        "2277:2672",
+        1
+      ]
+    },
+    "class_type": "ModelPatchTorchSettings",
+    "_meta": {
+      "title": "Model Patch Torch Settings"
+    }
+  },
+  "2277:2672": {
+    "inputs": {
+      "ctx_01": [
+        "2277:2668",
+        0
+      ],
+      "ctx_02": [
+        "2277:2671",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "Context Switch (rgthree)"
+    }
+  },
+  "2277:2668": {
+    "inputs": {
+      "model": [
+        "2277:7",
+        0
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (safetensor)"
+    }
+  },
+  "2277:7": {
+    "inputs": {
+      "unet_name": "ltx-2.3-22b-distilled_transformer_only_fp8_scaled.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": {
+      "title": "Load Diffusion Model"
+    }
+  },
+  "2277:2671": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (gguf)"
+    }
+  },
+  "2277:2872": {
+    "inputs": {
+      "ctx_01": [
+        "2277:2870",
+        0
+      ],
+      "ctx_02": [
+        "2277:2871",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "Context Switch (rgthree)"
+    }
+  },
+  "2277:2870": {
+    "inputs": {
+      "clip": [
+        "2277:5",
+        0
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (safetensor)"
+    }
+  },
+  "2277:5": {
+    "inputs": {
+      "clip_name1": "gemma_3_12B_it_fp4_mixed.safetensors",
+      "clip_name2": "ltx-2.3_text_projection_bf16.safetensors",
+      "type": "ltxv",
+      "device": "default"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": {
+      "title": "DualCLIPLoader (1st Textencoder, 2nd text_projection)"
+    }
+  },
+  "2277:2871": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (gguf)"
+    }
+  },
+  "2277:2643": {
+    "inputs": {
+      "text": [
+        "3200",
+        0
+      ],
+      "clip": [
+        "2205",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "CLIP Text Encode (Prompt)"
+    }
+  },
+  "2277:4": {
+    "inputs": {
+      "vae_name": "LTX23_video_vae_bf16.safetensors",
+      "device": "main_device",
+      "weight_dtype": "bf16"
+    },
+    "class_type": "VAELoaderKJ",
+    "_meta": {
+      "title": "VAELoader KJ Video"
+    }
+  },
+  "2277:2811": {
+    "inputs": {
+      "width": [
+        "2277:2812",
+        0
+      ],
+      "height": [
+        "2277:2812",
+        1
+      ],
+      "length": [
+        "2277:2248",
+        1
+      ],
+      "batch_size": 1
+    },
+    "class_type": "EmptyLTXVLatentVideo",
+    "_meta": {
+      "title": "EmptyLTXVLatentVideo"
+    }
+  },
+  "2277:2812": {
+    "inputs": {
+      "image": [
+        "2277:2813",
+        0
+      ]
+    },
+    "class_type": "GetImageSize",
+    "_meta": {
+      "title": "Get Image Size"
+    }
+  },
+  "2277:2813": {
+    "inputs": {
+      "upscale_method": "bicubic",
+      "scale_by": 0.5,
+      "image": [
+        "2277:2815",
+        0
+      ]
+    },
+    "class_type": "ImageScaleBy",
+    "_meta": {
+      "title": "Upscale Image By"
+    }
+  },
+  "2277:2815": {
+    "inputs": {
+      "img_compression": 22,
+      "image": [
+        "2277:2814",
+        0
+      ]
+    },
+    "class_type": "LTXVPreprocess",
+    "_meta": {
+      "title": "LTXVPreprocess"
+    }
+  },
+  "2277:2814": {
+    "inputs": {
+      "upscale_method": "bicubic",
+      "width": [
+        "2277:2916",
+        0
+      ],
+      "height": [
+        "2277:2916",
+        1
+      ],
+      "crop": "disabled",
+      "image": [
+        "2197",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "Upscale Image FirstFrame"
+    }
+  },
+  "2277:2916": {
+    "inputs": {
+      "method": "Use Precision Presets",
+      "precision_presets": "0.83 MP - HD",
+      "resolution_presets": "480p",
+      "no_scale": false,
+      "scale_from_image": true,
+      "aspect_preset": "9:16 - Social",
+      "swap_aspect": false,
+      "manual_aspect_width": 16,
+      "manual_aspect_height": 9,
+      "mode": "WAN/LTX (Div32)",
+      "custom_divisor": 64,
+      "image": [
+        "2197",
+        0
+      ]
+    },
+    "class_type": "DaSiWa_ResolutionScaleCalculator",
+    "_meta": {
+      "title": "DaSiWa Resolution Scale Calculator"
+    }
+  },
+  "2277:2248": {
+    "inputs": {
+      "expression": "(ceil((a * b - 1) / 8) * 8) + 1\n",
+      "values.a": [
+        "2277:2249",
+        0
+      ],
+      "values.b": [
+        "2277:2506",
+        0
+      ]
+    },
+    "class_type": "ComfyMathExpression",
+    "_meta": {
+      "title": "Math frames"
+    }
+  },
+  "2277:2249": {
+    "inputs": {
+      "value": 12
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Video seconds"
+    }
+  },
+  "2277:3037": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3038": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3063": {
+    "inputs": {
+      "positive": [
+        "2277:2638",
+        0
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3128": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3043": {
+    "inputs": {
+      "ctx_01": [
+        "2277:3039",
+        0
+      ],
+      "ctx_02": [
+        "2277:3040",
+        0
+      ],
+      "ctx_03": [
+        "2277:3041",
+        0
+      ],
+      "ctx_04": [
+        "2277:3062",
+        0
+      ],
+      "ctx_05": [
+        "2277:3129",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "Context Switch (rgthree)"
+    }
+  },
+  "2277:3039": {
+    "inputs": {
+      "negative": [
+        "2277:3028",
+        1
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3040": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3041": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3062": {
+    "inputs": {
+      "negative": [
+        "2277:2643",
+        0
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3129": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:2727": {
+    "inputs": {
+      "noise": [
+        "2277:3195",
+        0
+      ],
+      "guider": [
+        "2277:2729",
+        0
+      ],
+      "sampler": [
+        "2277:2233",
+        0
+      ],
+      "sigmas": [
+        "2277:3203",
+        0
+      ],
+      "latent_image": [
+        "2277:3205",
+        0
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "2277:3195": {
+    "inputs": {
+      "noise_seed": 333
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "2277:2729": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "2277:2733",
+        0
+      ],
+      "positive": [
+        "2277:2721",
+        0
+      ],
+      "negative": [
+        "2277:2721",
+        1
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFGGuider"
+    }
+  },
+  "2277:2733": {
+    "inputs": {
+      "preview_rate": 8,
+      "model": [
+        "2205",
+        0
+      ],
+      "latent_upscale_model": [
+        "2277:2",
+        0
+      ],
+      "vae": [
+        "2277:2381",
+        0
+      ]
+    },
+    "class_type": "LTX2SamplingPreviewOverride",
+    "_meta": {
+      "title": "LTX2 Sampling Preview Override"
+    }
+  },
+  "2277:2": {
+    "inputs": {
+      "model_name": "ltx-2.3-spatial-upscaler-x2-1.1.safetensors"
+    },
+    "class_type": "LatentUpscaleModelLoader",
+    "_meta": {
+      "title": "Load Latent Upscale Model spatial 2x resolution"
+    }
+  },
+  "2277:2381": {
+    "inputs": {
+      "vae_name": "taeltx2_3.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "VAE Preview"
+    }
+  },
+  "2277:2721": {
+    "inputs": {
+      "positive": [
+        "2277:2732",
+        0
+      ],
+      "negative": [
+        "2277:2732",
+        1
+      ],
+      "latent": [
+        "2277:2724",
+        0
+      ]
+    },
+    "class_type": "LTXVCropGuides",
+    "_meta": {
+      "title": "LTXVCropGuides"
+    }
+  },
+  "2277:2732": {
+    "inputs": {
+      "frame_rate": [
+        "2277:2506",
+        0
+      ],
+      "positive": [
+        "2277:3042",
+        4
+      ],
+      "negative": [
+        "2277:3043",
+        5
+      ]
+    },
+    "class_type": "LTXVConditioning",
+    "_meta": {
+      "title": "LTXVConditioning"
+    }
+  },
+  "2277:2724": {
+    "inputs": {
+      "noise": [
+        "2277:2229",
+        0
+      ],
+      "guider": [
+        "2277:2718",
+        0
+      ],
+      "sampler": [
+        "2277:2233",
+        0
+      ],
+      "sigmas": [
+        "2277:2938",
+        0
+      ],
+      "latent_image": [
+        "2277:3047",
+        6
+      ]
+    },
+    "class_type": "SamplerCustomAdvanced",
+    "_meta": {
+      "title": "SamplerCustomAdvanced"
+    }
+  },
+  "2277:2229": {
+    "inputs": {
+      "noise_seed": 709047825385741
+    },
+    "class_type": "RandomNoise",
+    "_meta": {
+      "title": "RandomNoise"
+    }
+  },
+  "2277:2718": {
+    "inputs": {
+      "cfg": 1,
+      "model": [
+        "2277:2733",
+        0
+      ],
+      "positive": [
+        "2277:2732",
+        0
+      ],
+      "negative": [
+        "2277:2732",
+        1
+      ]
+    },
+    "class_type": "CFGGuider",
+    "_meta": {
+      "title": "CFGGuider"
+    }
+  },
+  "2277:2233": {
+    "inputs": {
+      "sampler_name": "euler_ancestral_cfg_pp"
+    },
+    "class_type": "KSamplerSelect",
+    "_meta": {
+      "title": "KSamplerSelect"
+    }
+  },
+  "2277:2938": {
+    "inputs": {
+      "scheduler": "linear_quadratic",
+      "steps": 8,
+      "denoise": 1,
+      "model": [
+        "2277:2937",
+        0
+      ]
+    },
+    "class_type": "BasicScheduler",
+    "_meta": {
+      "title": "BasicScheduler ( for more steps)"
+    }
+  },
+  "2277:2937": {
+    "inputs": {
+      "shift": 13,
+      "model": [
+        "2205",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingSD3",
+    "_meta": {
+      "title": "ModelSamplingSD3"
+    }
+  },
+  "2277:3047": {
+    "inputs": {
+      "ctx_01": [
+        "2277:3044",
+        0
+      ],
+      "ctx_02": [
+        "2277:3045",
+        0
+      ],
+      "ctx_03": [
+        "2277:3046",
+        0
+      ],
+      "ctx_04": [
+        "2277:3052",
+        0
+      ],
+      "ctx_05": [
+        "2277:3060",
+        0
+      ]
+    },
+    "class_type": "Context Switch (rgthree)",
+    "_meta": {
+      "title": "Context Switch (rgthree)"
+    }
+  },
+  "2277:3044": {
+    "inputs": {
+      "latent": [
+        "2277:3028",
+        2
+      ]
+    },
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3045": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3046": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3052": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3060": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:3203": {
+    "inputs": {
+      "sigmas": "0.909375, 0.725, 0.421875, 0.0"
+    },
+    "class_type": "ManualSigmas",
+    "_meta": {
+      "title": "ManualSigmas"
+    }
+  },
+  "2277:3205": {
+    "inputs": {
+      "strength": 0.8,
+      "bypass": false,
+      "vae": [
+        "2277:4",
+        0
+      ],
+      "image": [
+        "2277:3207",
+        0
+      ],
+      "latent": [
+        "2277:2738",
+        0
+      ]
+    },
+    "class_type": "LTXVImgToVideoInplace",
+    "_meta": {
+      "title": "LTXVImgToVideoInplace"
+    }
+  },
+  "2277:3207": {
+    "inputs": {
+      "switch": false,
+      "on_false": [
+        "2277:2815",
+        0
+      ],
+      "on_true": [
+        "2277:3211",
+        7
+      ]
+    },
+    "class_type": "ComfySwitchNode",
+    "_meta": {
+      "title": "GUIDE IMAGE"
+    }
+  },
+  "2277:3211": {
+    "inputs": {},
+    "class_type": "Context (rgthree)",
+    "_meta": {
+      "title": "Context (rgthree)"
+    }
+  },
+  "2277:2738": {
+    "inputs": {
+      "samples": [
+        "2277:2721",
+        2
+      ],
+      "upscale_model": [
+        "2277:2",
+        0
+      ],
+      "vae": [
+        "2277:4",
+        0
+      ]
+    },
+    "class_type": "LTXVLatentUpsampler",
+    "_meta": {
+      "title": "spatial"
+    }
+  },
+  "2277:3167": {
+    "inputs": {
+      "spatial_tiles": 4,
+      "spatial_overlap": 4,
+      "temporal_tile_length": 32,
+      "temporal_overlap": 8,
+      "last_frame_fix": false,
+      "working_device": "auto",
+      "working_dtype": "auto",
+      "vae": [
+        "2277:4",
+        0
+      ],
+      "latents": [
+        "2277:3255",
+        2
+      ]
+    },
+    "class_type": "LTXVSpatioTemporalTiledVAEDecode",
+    "_meta": {
+      "title": "🅛🅣🅧 LTXV Spatio Temporal Tiled VAE Decode"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "music-vids",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "video": "bun run src/cli.ts",
+    "server": "bun run src/server.ts",
+    "plan": "bun run src/cli.ts plan",
+    "transcribe": "bun run src/cli.ts transcribe",
+    "clips": "bun run src/cli.ts clips",
+    "image": "bun run src/cli.ts image",
+    "approve-image": "bun run src/cli.ts approve-image",
+    "clip": "bun run src/cli.ts clip",
+    "frames": "bun run src/cli.ts extract-frames",
+    "approve": "bun run src/cli.ts approve",
+    "images": "bun run src/cli.ts images",
+    "render": "bun run src/cli.ts render",
+    "all": "bun run src/cli.ts all",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "typescript": "^6.0.3"
+  }
+}

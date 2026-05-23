@@ -1,0 +1,61 @@
+{
+  "audio": "./song.wav",
+  "workDir": "./work/song",
+  "output": "./output/song.mp4",
+  "theme": "short description of the song's visual world",
+  "visualStyle": "western comic, animated, cinematic realism, dramatic lighting, coherent music-video frames",
+  "width": 1280,
+  "height": 720,
+  "outputWidth": 1920,
+  "outputHeight": 1080,
+  "fps": 24,
+  "secondsPerClip": 12,
+  "fadeSeconds": 1.2,
+  "transcript": "./work/song/transcript.srt",
+  "imagePromptTemplate": "A cinematic Flux image prompt for this music-video scene. Overall theme: {{theme}}. Visual style: {{visualStyle}}. Time: {{time}}. Lyrics: {{lyrics}}. Describe one exact still frame in natural language with subject, setting, foreground, midground, background, camera angle, lighting, mood, and era.",
+  "videoPromptTemplate": "Cinematic music video shot for this moment of the song. Overall theme: {{theme}}. Visual style: {{visualStyle}}. Time: {{time}}. Lyrics at this moment: {{lyrics}}. Describe motion, atmosphere, camera movement, emotion, weather, light, and symbolic action.",
+  "transcription": {
+    "command": "./scripts/transcribe-whisper.cpp.sh",
+    "args": [
+      "{{audio}}",
+      "{{workDir}}",
+      "./models/ggml-distil-large-v3.bin"
+    ],
+    "expectedFile": "{{workDir}}/{{audioStem}}.srt"
+  },
+  "comfy": {
+    "path": "/home/horvay/ai/ComfyUI",
+    "baseUrl": "http://127.0.0.1:8188",
+    "launch": true,
+    "startupTimeoutSeconds": 180,
+    "imageWorkflowApiJson": "./flux_klein.json",
+    "videoWorkflowApiJson": "./music_vid_comfyui_video.json",
+    "imagePromptPath": "6.inputs.text",
+    "videoPromptPath": "3305.inputs.text",
+    "videoNegativePromptPath": "3200.inputs.value",
+    "seedPaths": [
+      "151.inputs.seed",
+      "145.inputs.noise_seed",
+      "41.inputs.seed",
+      "2277:2229.inputs.noise_seed",
+      "2277:3195.inputs.noise_seed"
+    ],
+    "fpsPath": "2277:2506.inputs.value",
+    "secondsPath": "2277:2249.inputs.value",
+    "filenamePrefixPath": "2196.inputs.filename_prefix",
+    "referenceImagePrefixPath": "9.inputs.filename_prefix",
+    "outputNodeId": "2196",
+    "imageOutputNodeId": "9",
+    "referenceImageNodeId": "9",
+    "videoInputImagePath": "2197.inputs.image",
+    "patches": [],
+    "widthPaths": [
+      "148.inputs.width",
+      "149.inputs.width"
+    ],
+    "heightPaths": [
+      "148.inputs.height",
+      "149.inputs.height"
+    ]
+  }
+}

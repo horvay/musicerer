@@ -1,0 +1,27 @@
+node_modules/
+work/
+output/
+.cache/
+*.log
+.DS_Store
+
+# Local machine/song config. Keep music-video.config.example.json tracked.
+music-video.config.json
+
+# Large/local media inputs and generated deliverables.
+*.wav
+*.mp3
+*.flac
+*.aiff
+*.m4a
+*.mp4
+*.mov
+*.webm
+*.mkv
+
+# Local model weights.
+models/*.bin
+models/*.gguf
+
+# Local fonts unless intentionally vendored with a clear license.
+*.ttf
