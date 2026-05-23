@@ -35,7 +35,6 @@ fi
 DEVICE="${WHISPERX_DEVICE:-cuda}"
 COMPUTE_TYPE="${WHISPERX_COMPUTE_TYPE:-float16}"
 BATCH_SIZE="${WHISPERX_BATCH_SIZE:-16}"
-CHUNK_SIZE="${WHISPERX_CHUNK_SIZE:-60}"
 
 # WhisperX writes files named after the input stem into OUT_DIR.
 # Output JSON is useful for word-level caption workflows; SRT/TXT feed the planner.
@@ -45,7 +44,6 @@ $BIN "$AUDIO" \
   --device "$DEVICE" \
   --compute_type "$COMPUTE_TYPE" \
   --batch_size "$BATCH_SIZE" \
-  --chunk_size "$CHUNK_SIZE" \
   --output_dir "$OUT_DIR" \
   --output_format all \
   "${LANGUAGE_ARGS[@]}"

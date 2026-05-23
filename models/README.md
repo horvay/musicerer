@@ -10,5 +10,4 @@ Useful overrides:
 export WHISPERX_MODEL=large-v3
 export WHISPERX_DEVICE=cuda
 export WHISPERX_COMPUTE_TYPE=float16
-export WHISPERX_CHUNK_SIZE=60
 ```

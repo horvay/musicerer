@@ -22,7 +22,7 @@ deprecated-workflows/             old workflows not used by current config
 
 ## Local transcription with WhisperX
 
-Preferred transcription uses the external `whisperx` CLI. The wrapper defaults to the `large-v3` model and 60-second VAD chunks, writes SRT/TXT/JSON outputs into the song work directory, and copies stable names used by the rest of the workflow:
+Preferred transcription uses the external `whisperx` CLI. The wrapper defaults to the `large-v3` model and WhisperX's default VAD chunking, writes SRT/TXT/JSON outputs into the song work directory, and copies stable names used by the rest of the workflow:
 
 ```text
 work/<song>/transcript.srt
@@ -37,7 +37,7 @@ bun run transcribe
 Useful overrides:
 
 ```bash
-WHISPERX_MODEL=large-v3 WHISPERX_DEVICE=cuda WHISPERX_COMPUTE_TYPE=float16 WHISPERX_CHUNK_SIZE=60 bun run transcribe
+WHISPERX_MODEL=large-v3 WHISPERX_DEVICE=cuda WHISPERX_COMPUTE_TYPE=float16 bun run transcribe
 ```
 
 ## Prompt style
