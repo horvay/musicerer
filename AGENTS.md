@@ -6,7 +6,7 @@ This project is a Pi-controlled autonomous workflow for turning WAV songs into A
 
 - Keep agents project-local in `.pi/agents/`; do not add these music-video agents to global Pi config.
 - Prefer Bun + TypeScript for project code.
-- Do not add Python project code. External tools may exist, but transcription should prefer `whisper.cpp` / `whisper-cli` with `models/ggml-distil-large-v3.bin`.
+- Do not add Python project code. External tools may exist, but transcription should prefer the external `whisperx` CLI with the `large-v3` model.
 - Use `flux_klein.json` as the only still-image workflow. Do not use old image workflows and do not fall back to them.
 - Never generate still images directly from the main assistant context. All Flux still-image generation must be delegated to the project-local `music-video-clip-maker` subagent. During the still-image pass, generate 3 still attempts per scene, and the clip-maker may queue up to 10 scenes at a time for still generation only (30 still images total).
 - Use `music_vid_comfyui_video.json` for LTX image-to-video from approved Flux stills.

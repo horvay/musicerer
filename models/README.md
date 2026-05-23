@@ -1,19 +1,13 @@
-# Whisper models
+# Transcription models
 
-Place a local whisper.cpp model here, preferably:
+The current transcription path uses the external `whisperx` CLI, defaulting to the `large-v3` model. WhisperX downloads/caches model files outside this project according to its own Hugging Face/PyTorch cache settings.
 
-```text
-ggml-distil-large-v3.bin
-```
+This directory is intentionally not used for committed model weights. Large local model files such as `*.bin` and `*.gguf` are ignored by Git.
 
-The config expects:
-
-```text
-models/ggml-distil-large-v3.bin
-```
-
-You can also keep the model elsewhere and set:
+Useful overrides:
 
 ```bash
-export WHISPER_MODEL=/absolute/path/to/ggml-distil-large-v3.bin
+export WHISPERX_MODEL=large-v3
+export WHISPERX_DEVICE=cuda
+export WHISPERX_COMPUTE_TYPE=float16
 ```

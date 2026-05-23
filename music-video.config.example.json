@@ -15,13 +15,13 @@
   "imagePromptTemplate": "A cinematic Flux image prompt for this music-video scene. Overall theme: {{theme}}. Visual style: {{visualStyle}}. Time: {{time}}. Lyrics: {{lyrics}}. Describe one exact still frame in natural language with subject, setting, foreground, midground, background, camera angle, lighting, mood, and era.",
   "videoPromptTemplate": "Cinematic music video shot for this moment of the song. Overall theme: {{theme}}. Visual style: {{visualStyle}}. Time: {{time}}. Lyrics at this moment: {{lyrics}}. Describe motion, atmosphere, camera movement, emotion, weather, light, and symbolic action.",
   "transcription": {
-    "command": "./scripts/transcribe-whisper.cpp.sh",
+    "command": "./scripts/transcribe-whisperx.sh",
     "args": [
       "{{audio}}",
       "{{workDir}}",
-      "./models/ggml-distil-large-v3.bin"
+      "large-v3"
     ],
-    "expectedFile": "{{workDir}}/{{audioStem}}.srt"
+    "expectedFile": "{{workDir}}/transcript.srt"
   },
   "comfy": {
     "path": "/home/horvay/ai/ComfyUI",

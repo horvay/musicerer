@@ -14,18 +14,30 @@ flux_klein.json                   Flux Klein still-image workflow
 music_vid_comfyui_video.json      LTX image-to-video workflow
 docs/PROMPTING.md                 Flux image + LTX video prompt guide
 src/cli.ts                        Bun/TypeScript helper CLI
-scripts/transcribe-whisper.cpp.sh whisper.cpp transcription wrapper
+scripts/transcribe-whisperx.sh    WhisperX transcription wrapper
 work/                             transcript, plans, attempts, approved clips, polish/remaster reports
 output/                           final, remastered, and captioned MP4s
 deprecated-workflows/             old workflows not used by current config
 ```
 
-## Local Whisper without Python project code
+## Local transcription with WhisperX
 
-Preferred transcription uses `whisper.cpp` / `whisper-cli` with the local Distil-Whisper large v3 GGML model.
+Preferred transcription uses the external `whisperx` CLI. The wrapper defaults to the `large-v3` model, writes SRT/TXT/JSON outputs into the song work directory, and copies stable names used by the rest of the workflow:
+
+```text
+work/<song>/transcript.srt
+work/<song>/transcript.txt
+work/<song>/transcript.json
+```
 
 ```bash
 bun run transcribe
+```
+
+Useful overrides:
+
+```bash
+WHISPERX_MODEL=large-v3 WHISPERX_DEVICE=cuda WHISPERX_COMPUTE_TYPE=float16 bun run transcribe
 ```
 
 ## Prompt style

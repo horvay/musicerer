@@ -237,7 +237,7 @@ function parseWhisperWords(path: string): WordTiming[] {
       ? Math.abs(segmentEnd - segmentStart) / 1000
       : Math.abs(segmentEnd - segmentStart);
 
-    // whisper.cpp sometimes emits a second consecutive duplicate lyric segment with
+    // ASR tools sometimes emit a second consecutive duplicate lyric segment with
     // zero/near-zero duration at the boundary. Keep the first real segment and drop
     // the bogus duplicate so alignment cannot choose its unusable timestamps.
     if (normalizedSegmentText && normalizedSegmentText === previousSegmentText && segmentDurationSeconds <= 0.15) continue;
