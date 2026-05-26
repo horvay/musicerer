@@ -80,21 +80,22 @@ Only handle the request directly when no existing project subagent fits, when th
 ## Current ComfyUI workflow wiring
 
 - Image workflow: `flux_klein.json`
-- Video workflow: `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json`
+- Video workflow: `wan_hardcoded.json`
 - WAN video model: high `wan22RemixI2VGGUFV30_highQ6K.gguf`, low `wan22RemixI2VGGUFV30_lowQ6K.gguf`
 - WAN 4-step LoRAs: `wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors`, `wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors`
+- WAN SmoothMix LoRAs: `SmoothMixAnimation_High.safetensors`, `SmoothMixAnimation_Low.safetensors` at `0.7`
 - WAN VAE / CLIP: `wan_2.1_vae.safetensors`, `umt5_xxl_fp8_e4m3fn_scaled.safetensors`
-- WAN sampler: `euler_ancestral`, 4-step LightX2V mode enabled, split step `2`, CFG `1`
-- WAN generation size: `832x480`, then editor/polish conforms approved clips to final `1920x1080` and planned scene duration
+- WAN sampler: `euler`, 4-step LightX2V mode enabled, split step `2`, CFG `1`
+- WAN generation size: `832x480`, 81 frames at 16 fps, then RIFE interpolation / output handling in `wan_hardcoded.json`; editor/polish conforms approved clips to final `1920x1080` and planned scene duration
 - Flux Klein image prompt: `6.inputs.text`
 - Flux Klein image output node: `9` (`SaveImage`)
 - Flux Klein image seeds: `151.inputs.seed`, `145.inputs.noise_seed`, `41.inputs.seed`
 - Flux Klein image size: `148.inputs.width`, `148.inputs.height`, `149.inputs.width`, `149.inputs.height`
-- Video prompt: `129:93.inputs.text`
-- Video negative prompt: `129:89.inputs.text`
-- Approved image input to video workflow: `97.inputs.image`
-- Video output node: `108` (`SaveVideo`)
-- FPS: `129:162.inputs.value`
+- Video prompt: `452.inputs.text`
+- Video negative prompt: `451.inputs.text`
+- Approved image input to video workflow: `484.inputs.image` and `174.inputs.image`
+- Video output node: `63` (`VHS_VideoCombine`)
+- FPS: hardcoded in `wan_hardcoded.json`
 
 ## Important commands
 

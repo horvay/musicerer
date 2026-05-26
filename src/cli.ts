@@ -509,6 +509,7 @@ function patchWorkflow(config: Config, plan: Plan, scene: Scene, mode: "image" |
         imagePrompt: scene.imagePrompt,
         videoPrompt: scene.videoPrompt,
         prompt: scene.videoPrompt,
+        inputImage: inputImageName ?? "",
         seed,
         width: plan.width,
         height: plan.height,

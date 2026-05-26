@@ -1,0 +1,705 @@
+{
+  "63": {
+    "inputs": {
+      "frame_rate": [
+        "697",
+        0
+      ],
+      "loop_count": 0,
+      "filename_prefix": "video/2026-05-25/213833",
+      "format": "video/h265-mp4",
+      "pix_fmt": "yuv420p10le",
+      "crf": [
+        "458",
+        0
+      ],
+      "save_metadata": true,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "709",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "Video Combine 🎥🅥🅗🅢"
+    }
+  },
+  "174": {
+    "inputs": {
+      "image": "pasted/image (2).png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Last-Frame-Image"
+    }
+  },
+  "421": {
+    "inputs": {
+      "clip_name": "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+      "type": "wan",
+      "device": "default"
+    },
+    "class_type": "CLIPLoader",
+    "_meta": {
+      "title": "Load CLIP"
+    }
+  },
+  "422": {
+    "inputs": {
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+      "strength_model": 1,
+      "model": [
+        "716",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "Low LightX2V LoRA"
+    }
+  },
+  "423": {
+    "inputs": {
+      "lora_name": "SmoothMixAnimation_Low.safetensors",
+      "strength_model": 0.7,
+      "model": [
+        "422",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "Low SmoothMix LoRA"
+    }
+  },
+  "425": {
+    "inputs": {
+      "shift": 5,
+      "model": [
+        "437",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingSD3",
+    "_meta": {
+      "title": "Sigma Shift High"
+    }
+  },
+  "426": {
+    "inputs": {
+      "shift": 5,
+      "model": [
+        "423",
+        0
+      ]
+    },
+    "class_type": "ModelSamplingSD3",
+    "_meta": {
+      "title": "Sigma Shift Low"
+    }
+  },
+  "436": {
+    "inputs": {
+      "lora_name": "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+      "strength_model": 1,
+      "model": [
+        "715",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "High LightX2V LoRA"
+    }
+  },
+  "437": {
+    "inputs": {
+      "lora_name": "SmoothMixAnimation_High.safetensors",
+      "strength_model": 0.7,
+      "model": [
+        "436",
+        0
+      ]
+    },
+    "class_type": "LoraLoaderModelOnly",
+    "_meta": {
+      "title": "High SmoothMix LoRA"
+    }
+  },
+  "446": {
+    "inputs": {
+      "value": 1
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "CFG"
+    }
+  },
+  "447": {
+    "inputs": {
+      "value": 2
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Step to swap"
+    }
+  },
+  "449": {
+    "inputs": {
+      "text": "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走, readable text, captions, subtitles, title cards, logo, watermark, signature, UI overlay, modern cars, asphalt roads, road markings, power lines, electric lights, neon, plastic, modern machinery, modern clothing, malformed foreground hands, extra fingers, fused fingers, missing fingers, realistic, photoreal, photo-real, realism, cinematic realism, hyperreal",
+      "clip": [
+        "421",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative (standard WAN)"
+    }
+  },
+  "451": {
+    "inputs": {
+      "text": "",
+      "clip": [
+        "421",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative prompt"
+    }
+  },
+  "452": {
+    "inputs": {
+      "text": "The camera makes a slow push inside the stone lamp room as the man steadies the brass oil cup and trims the wick. The small flame flickers against his beard and red scarf, rain crawls down the glass, rope and canvas shift softly, and the ruined harbor below remains a dim blue-black shape beneath heavy overcast. Render the motion with a stylized western comic book animation look: bold inked outlines, graphic shadow shapes, painterly comic panels, dramatic cel-shaded contrast, and hand-drawn adventure illustration energy. Render with a cinematic anime animation look: expressive anime character features, clean drawn linework, cel-shaded lighting, hand-painted background depth, and fluid anime film motion.",
+      "clip": [
+        "421",
+        0
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Positive prompt"
+    }
+  },
+  "455": {
+    "inputs": {
+      "vae_name": "wan_2.1_vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load VAE"
+    }
+  },
+  "457": {
+    "inputs": {
+      "value": 16
+    },
+    "class_type": "PrimitiveFloat",
+    "_meta": {
+      "title": "FPS"
+    }
+  },
+  "458": {
+    "inputs": {
+      "value": 19
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "CRF"
+    }
+  },
+  "470": {
+    "inputs": {
+      "seed": -1
+    },
+    "class_type": "Seed (rgthree)",
+    "_meta": {
+      "title": "Seed"
+    }
+  },
+  "484": {
+    "inputs": {
+      "image": "pasted/image (2).png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "First-Frame-Image"
+    }
+  },
+  "524": {
+    "inputs": {
+      "value": 81
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Frames"
+    }
+  },
+  "534": {
+    "inputs": {
+      "value": 832
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Width - start resolution"
+    }
+  },
+  "535": {
+    "inputs": {
+      "value": 480
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Height - start resolution"
+    }
+  },
+  "570": {
+    "inputs": {
+      "value": 4
+    },
+    "class_type": "PrimitiveInt",
+    "_meta": {
+      "title": "Steps_total"
+    }
+  },
+  "621": {
+    "inputs": {
+      "any_02": [
+        "701",
+        0
+      ]
+    },
+    "class_type": "Any Switch (rgthree)",
+    "_meta": {
+      "title": "Any Switch (rgthree)"
+    }
+  },
+  "691": {
+    "inputs": {
+      "width": 832,
+      "height": 480,
+      "length": 81,
+      "batch_size": 1,
+      "positive": [
+        "452",
+        0
+      ],
+      "negative": [
+        "451",
+        0
+      ],
+      "vae": [
+        "455",
+        0
+      ],
+      "start_image": [
+        "693",
+        0
+      ]
+    },
+    "class_type": "WanImageToVideo",
+    "_meta": {
+      "title": "WanImageToVideo hardcoded"
+    }
+  },
+  "692": {
+    "inputs": {
+      "width": 1280,
+      "height": 1280,
+      "resize_mode": "Keep AR",
+      "divisible_by": 16,
+      "max_batch_size": 3,
+      "sinc_window": 3,
+      "pad_color": "0, 0, 0",
+      "crop_position": "center",
+      "precision": "fp32",
+      "image": [
+        "174",
+        0
+      ]
+    },
+    "class_type": "BatchResizeWithLanczos",
+    "_meta": {
+      "title": "🐇 Batch Resize w/ Lanczos"
+    }
+  },
+  "693": {
+    "inputs": {
+      "width": 1280,
+      "height": 1280,
+      "resize_mode": "Keep AR",
+      "divisible_by": 16,
+      "max_batch_size": 3,
+      "sinc_window": 3,
+      "pad_color": "0, 0, 0",
+      "crop_position": "center",
+      "precision": "fp32",
+      "image": [
+        "484",
+        0
+      ]
+    },
+    "class_type": "BatchResizeWithLanczos",
+    "_meta": {
+      "title": "🐇 Batch Resize w/ Lanczos"
+    }
+  },
+  "694": {
+    "inputs": {
+      "add_noise": "enable",
+      "noise_seed": [
+        "470",
+        0
+      ],
+      "steps": [
+        "570",
+        0
+      ],
+      "cfg": [
+        "446",
+        0
+      ],
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "start_at_step": 0,
+      "end_at_step": [
+        "447",
+        0
+      ],
+      "return_with_leftover_noise": "enable",
+      "model": [
+        "425",
+        0
+      ],
+      "positive": [
+        "691",
+        0
+      ],
+      "negative": [
+        "691",
+        1
+      ],
+      "latent_image": [
+        "691",
+        2
+      ]
+    },
+    "class_type": "KSamplerAdvanced",
+    "_meta": {
+      "title": "KSampler (High)"
+    }
+  },
+  "695": {
+    "inputs": {
+      "add_noise": "disable",
+      "noise_seed": [
+        "470",
+        0
+      ],
+      "steps": [
+        "570",
+        0
+      ],
+      "cfg": [
+        "446",
+        0
+      ],
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "start_at_step": [
+        "447",
+        0
+      ],
+      "end_at_step": 10000,
+      "return_with_leftover_noise": "disable",
+      "model": [
+        "426",
+        0
+      ],
+      "positive": [
+        "691",
+        0
+      ],
+      "negative": [
+        "691",
+        1
+      ],
+      "latent_image": [
+        "694",
+        0
+      ]
+    },
+    "class_type": "KSamplerAdvanced",
+    "_meta": {
+      "title": "KSampler (Low)"
+    }
+  },
+  "696": {
+    "inputs": {
+      "samples": [
+        "695",
+        0
+      ],
+      "vae": [
+        "455",
+        0
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "697": {
+    "inputs": {
+      "a": [
+        "457",
+        0
+      ],
+      "b": 2,
+      "operation": "multiply"
+    },
+    "class_type": "easy mathFloat",
+    "_meta": {
+      "title": "Math Float"
+    }
+  },
+  "698": {
+    "inputs": {
+      "ckpt_name": "rife49.pth",
+      "clear_cache_after_n_frames": 10,
+      "multiplier": 2,
+      "fast_mode": true,
+      "ensemble": true,
+      "scale_factor": 1,
+      "dtype": "float32",
+      "torch_compile": false,
+      "batch_size": 1,
+      "frames": [
+        "621",
+        0
+      ]
+    },
+    "class_type": "RIFE VFI",
+    "_meta": {
+      "title": "RIFE VFI (recommend rife47 and rife49)"
+    }
+  },
+  "699": {
+    "inputs": {
+      "ckpt_name": "rife49.pth",
+      "multiplier": [
+        "700",
+        1
+      ],
+      "t_mode": "linear",
+      "t_gamma": 1,
+      "t_min": 0,
+      "t_max": 1,
+      "scale_factor": 1,
+      "ensemble": true,
+      "clear_cache_after_n_frames": 200,
+      "custom_t_list_csv": [
+        "700",
+        0
+      ],
+      "frames": [
+        "702",
+        0
+      ]
+    },
+    "class_type": "RIFE_VFI_Advanced",
+    "_meta": {
+      "title": "🐇 RIFE VFI Custom Timing"
+    }
+  },
+  "700": {
+    "inputs": {
+      "ckpt_name": "rife49.pth",
+      "scale_factor": 1,
+      "ensemble": true,
+      "multiplier": 4,
+      "use_first_two": true,
+      "use_last_two": true,
+      "use_global_median": true,
+      "calibrate_metric": "MSE",
+      "calibrate_iters": 12,
+      "t_min": 0,
+      "t_max": 0.96,
+      "auto_tmax": true,
+      "t_cap": 0.995,
+      "full_clip": [
+        "702",
+        1
+      ]
+    },
+    "class_type": "RIFE_SeamTimingAnalyzer",
+    "_meta": {
+      "title": "🐇 RIFE Seam Timing Analyzer"
+    }
+  },
+  "701": {
+    "inputs": {
+      "original_images": [
+        "702",
+        1
+      ],
+      "interpolated_frames": [
+        "699",
+        0
+      ]
+    },
+    "class_type": "AssembleLoopFrames",
+    "_meta": {
+      "title": "🐇 Assemble Loop Frames"
+    }
+  },
+  "702": {
+    "inputs": {
+      "images": [
+        "703",
+        0
+      ]
+    },
+    "class_type": "PrepareLoopFrames",
+    "_meta": {
+      "title": "🐇 Prepare Loop Frames"
+    }
+  },
+  "703": {
+    "inputs": {
+      "max_end_crop_frames": 8,
+      "include_first_step": true,
+      "include_last_step": true,
+      "include_global_median_step": true,
+      "seam_window_frames": 6,
+      "distance_metric": "MSE",
+      "score_in_8bit": false,
+      "use_ssim_similarity": true,
+      "use_exposure_guard": true,
+      "use_flow_guard": true,
+      "weight_step_size": 0.55,
+      "weight_similarity": 0.3,
+      "weight_exposure": 0.1,
+      "weight_flow": 0.05,
+      "ssim_downsample_scales": "1,2",
+      "accelerate_with_gpu": true,
+      "use_mixed_precision": true,
+      "clip_frames": [
+        "696",
+        0
+      ]
+    },
+    "class_type": "AutocropToLoop",
+    "_meta": {
+      "title": "🐇 Autocrop to Loop"
+    }
+  },
+  "709": {
+    "inputs": {
+      "width": [
+        "710",
+        0
+      ],
+      "height": [
+        "711",
+        0
+      ],
+      "resize_mode": "Keep AR",
+      "divisible_by": 16,
+      "max_batch_size": 3,
+      "sinc_window": 3,
+      "pad_color": "0, 0, 0",
+      "crop_position": "center",
+      "precision": "fp32",
+      "image": [
+        "698",
+        0
+      ]
+    },
+    "class_type": "BatchResizeWithLanczos",
+    "_meta": {
+      "title": "🐇 Batch Resize w/ Lanczos"
+    }
+  },
+  "710": {
+    "inputs": {
+      "a": [
+        "534",
+        0
+      ],
+      "b": 2,
+      "operation": "multiply"
+    },
+    "class_type": "easy mathInt",
+    "_meta": {
+      "title": "Math width"
+    }
+  },
+  "711": {
+    "inputs": {
+      "a": [
+        "535",
+        0
+      ],
+      "b": 2,
+      "operation": "multiply"
+    },
+    "class_type": "easy mathInt",
+    "_meta": {
+      "title": "Math height"
+    }
+  },
+  "712": {
+    "inputs": {
+      "unet_name": "wan22RemixI2VGGUFV30_highQ6K.gguf",
+      "dequant_dtype": "default",
+      "patch_dtype": "default",
+      "patch_on_device": false
+    },
+    "class_type": "UnetLoaderGGUFAdvanced",
+    "_meta": {
+      "title": "High GGUF Advanced"
+    }
+  },
+  "714": {
+    "inputs": {
+      "unet_name": "wan22RemixI2VGGUFV30_lowQ6K.gguf",
+      "dequant_dtype": "default",
+      "patch_dtype": "default",
+      "patch_on_device": false
+    },
+    "class_type": "UnetLoaderGGUFAdvanced",
+    "_meta": {
+      "title": "Low GGUF Advanced"
+    }
+  },
+  "715": {
+    "inputs": {
+      "any_02": [
+        "712",
+        0
+      ]
+    },
+    "class_type": "Any Switch (rgthree)",
+    "_meta": {
+      "title": "Any Switch (rgthree)"
+    }
+  },
+  "716": {
+    "inputs": {
+      "any_02": [
+        "714",
+        0
+      ]
+    },
+    "class_type": "Any Switch (rgthree)",
+    "_meta": {
+      "title": "Any Switch (rgthree)"
+    }
+  }
+}
