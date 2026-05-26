@@ -1,6 +1,7 @@
 node_modules/
 work/
 output/
+tmp/
 .cache/
 *.log
 .DS_Store
