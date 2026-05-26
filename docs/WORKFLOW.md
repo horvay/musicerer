@@ -2,8 +2,8 @@
 
 ## Agents
 
-- `music-video-director` — creates/revises the lyric-aware visual plan and Flux/LTX prompts.
-- `music-video-clip-maker` — generates still-image batches of 3 Flux attempts per scene, optionally queued for up to 10 scenes at a time during the still pass; generates exactly one requested LTX video attempt.
+- `music-video-director` — creates/revises the lyric-aware visual plan and Flux/WAN prompts.
+- `music-video-clip-maker` — generates still-image batches of 3 Flux attempts per scene, optionally queued for up to 10 scenes at a time during the still pass; generates exactly one requested WAN video attempt.
 - `music-video-critic` — reviews generated images/videos, scores them, approves accepted attempts, and writes retry guidance.
 - `music-video-polish-editor` — after all scene videos are approved, optionally polishes one approved clip at a time with FFmpeg by inspecting frames, cropping/reframing, grading, retiming, and validating the result.
 - `music-video-editor` — renders approved/polished clips into the clean final MP4.
@@ -12,16 +12,39 @@
 ## Current generation stack
 
 - Still images: `flux_klein.json` using Flux Klein.
-- Image-to-video: `music_vid_comfyui_video.json` using LTX from the approved Flux still.
+- Image-to-video: `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json` using WAN 2.2 from the approved Flux still.
+- WAN video stack: Remix GGUF high/low models, 4-step LightX2V LoRAs enabled, `euler_ancestral`, split step `2`, CFG `1`, and `832x480` generation before polish/editor conforming.
 - Flux image prompts are natural-language `imagePrompt` values at `6.inputs.text`.
 - There is no image negative prompt for Flux. Do not use `imageNegativePrompt`.
-- LTX video prompts remain `videoPrompt` values at `3305.inputs.text`.
+- WAN video prompts remain `videoPrompt` values at `129:93.inputs.text`; video negatives are patched at `129:89.inputs.text`.
 
 ## Autonomous loop
 
-Work in controlled agent batches. During still-image generation only, the clip-maker may queue up to 10 scenes at a time, generating 3 still attempts per scene for a maximum of 30 still images total. Video generation, retries after critique, polish, rendering, remastering, and captions remain ordered agent-controlled work; do not use ad hoc shell loops outside the clip-maker's documented still queue.
+Work in controlled agent batches. During still-image generation only, the clip-maker may queue up to 10 scenes in one invocation, generating 3 still attempts per scene for a maximum of 30 still images total. Video generation, retries after critique, polish, rendering, remastering, and captions remain ordered agent-controlled work; do not use ad hoc shell loops outside the clip-maker's documented still queue.
 
 The director should validate new plans against any user-stated clip-duration range. The range is literal and inclusive when creating or revising a plan: if the user requests `4-12 second clips`, aim for `clipDuration >= 4.0` and `clipDuration <= 12.0`, and do not substitute defaults such as 8-12 seconds. However, do not block generation solely because an existing plan has longer clips; assume the user may have intentionally allowed or accepted them unless they explicitly ask for a timing fix.
+
+### Phase -1 — required WhisperX word timing pass
+
+Before any scene planning, always run WhisperX with the `large-v3` model against the source song and keep the JSON word timings. For final caption timing, the preferred high-accuracy pass is full-song WhisperX `large-v3` on CPU with `float32` and `batch_size 4`; if a passage is dropped, run additional WhisperX passes with different model/compute settings and use the best AI-derived timing before falling back to interpolation:
+
+```bash
+bun run video transcribe
+# or explicitly:
+WHISPERX_MODEL=large-v3 bun run video transcribe
+# caption timing high-accuracy example:
+# uvx --from whisperx whisperx <final-audio.wav> --model large-v3 --language en --device cpu --compute_type float32 --batch_size 4 --output_format json
+```
+
+Required artifacts:
+
+```text
+work/<song>/transcript.txt
+work/<song>/transcript.srt
+work/<song>/transcript.json
+```
+
+The plan must use `transcript.json` word timings, aligned to the corrected/trusted lyric text when WhisperX mishears words. Scene starts/ends should be derived from real word/phrase timings, not guessed from rough song sections or later interpolated caption timings. If WhisperX drops or misrecognizes words, locally interpolate only those missing words between adjacent aligned words and document the caveat in `director-plan.md`.
 
 ### Phase 0 — song-specific failure conditions
 
@@ -40,12 +63,12 @@ Record the accepted conditions in `work/<song>/director-plan.md` and, when pract
 4. If any still for a scene scores `9+`, critic runs `approve-image` for the best accepted still and the workflow advances that scene.
 5. If all 3 stills for a scene score below `9`, critic writes a detailed comparative failure report tied to the lyrics/story beat. Director revises that scene's Flux prompt using the report, then clip-maker generates the next 3 attempts for that scene.
 6. Hard cap: after 30 image attempts for a scene, stop retrying. Select the highest-scored image attempt for that scene, run `approve-image` with its actual score/report, and advance even if the score is below `9`.
-7. Do not generate any LTX videos until every scene has a critic-approved or 30-attempt-selected Flux still.
+7. Do not generate any WAN videos until every scene has a critic-approved or 30-attempt-selected Flux still.
 
 ### Phase 2 — video pass
 
-1. After all scenes have approved images, clip-maker generates one LTX video attempt for scene 1 from its approved image.
-2. Critic extracts frames and scores the video 1-10.
+1. After all scenes have approved images, clip-maker generates one WAN video attempt for scene 1 from its approved image.
+2. Critic extracts frames and scores the video 1-10. Reject videos with persistent white speckles/dots, snow-like flecks, salt-and-pepper artifacts, bright point-noise, or mosaic/block breakup across frames.
 3. If score is `8+`, critic approves the video and the workflow advances to the next scene.
 4. If score is below `8`, director revises the `videoPrompt` / `videoNegativePrompt`, clip-maker retries the same scene, and critic reviews again.
 5. Continue until every scene has an approved video.

@@ -87,48 +87,48 @@ ffmpeg -hide_banner -y \
   work/<song>/captions/<song>-final-audio.wav
 ```
 
-### Required timing method: 60-second chunked WhisperX forced alignment via `uvx`
+### Required timing method: full-song WhisperX `large-v3` float32 first, with AI rerun fallback
 
-Use WhisperX as the preferred timing source, but do **not** run it on the full song as one file. Split the extracted WAV into approximately 60-second chunks, run WhisperX on each chunk, then merge word timings back onto the full-song timeline by adding each chunk's start offset. Chunking keeps long-song alignment more local and makes lyric timing review/repair easier.
+Use WhisperX as the preferred timing source. First run WhisperX on the full extracted WAV with `large-v3`, CPU, and `float32`; this is slower but proved more accurate for difficult sung lyric passages than chunked CPU/int8 runs. Do not default to scene interpolation or manual guessed timing when WhisperX misses a passage.
 
-Create one-minute chunks from the extracted mono 16k WAV:
+If the first full-song pass drops/mangles a lyric passage, run at least two additional WhisperX passes with radically different settings (for example `small`/`int8` and `medium`/`int8`, or a GPU/float16 pass if available), compare the word timings around the failed passage, and use the best AI-derived timings. Document which run supplied each repaired passage.
+
+Run the primary full-song WhisperX pass through `uvx` so it remains an external tool and does not add Python project code:
 
 ```bash
-mkdir -p work/<song>/captions/chunks/minute-wav work/<song>/captions/chunks/whisperx work/<song>/captions/chunks/words
-ffmpeg -hide_banner -y \
-  -i work/<song>/captions/<song>-final-audio.wav \
-  -f segment \
-  -segment_time 60 \
-  -reset_timestamps 1 \
-  -c copy \
-  work/<song>/captions/chunks/minute-wav/<song>-chunk-%03d.wav
+mkdir -p work/<song>/captions/whisperx/full-large-v3-float32
+uvx --from whisperx whisperx \
+  work/<song>/captions/<song>-final-audio.wav \
+  --model large-v3 \
+  --language en \
+  --device cpu \
+  --compute_type float32 \
+  --batch_size 4 \
+  --output_dir work/<song>/captions/whisperx/full-large-v3-float32 \
+  --output_format json \
+  --highlight_words True \
+  --print_progress True
 ```
 
-Run WhisperX through `uvx` on each chunk so it remains an external tool and does not add Python project code:
+Suggested AI rerun fallback commands for difficult passages:
 
 ```bash
-for chunk in work/<song>/captions/chunks/minute-wav/<song>-chunk-*.wav; do
-  base=$(basename "$chunk" .wav)
-  uvx --from whisperx whisperx \
-    "$chunk" \
-    --model small \
-    --language en \
-    --device cpu \
-    --compute_type int8 \
-    --output_dir "work/<song>/captions/chunks/whisperx/$base" \
-    --output_format json \
-    --highlight_words True \
-    --print_progress True
-done
+mkdir -p work/<song>/captions/whisperx/experiments/small-int8-b4
+uvx --from whisperx whisperx work/<song>/captions/<song>-final-audio.wav \
+  --model small --language en --device cpu --compute_type int8 --batch_size 4 \
+  --output_dir work/<song>/captions/whisperx/experiments/small-int8-b4 --output_format json
+
+mkdir -p work/<song>/captions/whisperx/experiments/medium-int8-b1
+uvx --from whisperx whisperx work/<song>/captions/<song>-final-audio.wav \
+  --model medium --language en --device cpu --compute_type int8 --batch_size 1 \
+  --output_dir work/<song>/captions/whisperx/experiments/medium-int8-b1 --output_format json
 ```
 
 Notes:
-- `--model small --device cpu --compute_type int8` is the safe default proven to run locally. If GPU is available and stable, a larger model may be tried, but do not assume GPU availability.
+- Primary timing source is `--model large-v3 --device cpu --compute_type float32 --batch_size 4` unless a different WhisperX run clearly aligns a specific passage better.
 - WhisperX may download Python packages and a wav2vec2 alignment model into user caches on first run.
 - WhisperX may still mishear lyrics. That is acceptable because displayed text comes from the trusted lyric script; WhisperX is only the timing source.
-- Each chunk output JSON is usually under `work/<song>/captions/chunks/whisperx/<chunk-stem>/<chunk-stem>.json`.
-- When merging chunk JSON, compute the chunk offset from its numeric suffix times 60 seconds, then add that offset to every segment and word `start`/`end`. For the final chunk, keep natural shorter duration. Sort merged segments/words by absolute time.
-- Write the merged WhisperX JSON to `work/<song>/captions/whisperx/<song>-chunked-merged.json` and convert that merged file into `work/<song>/captions/words/<song>-words.json`.
+- Write the selected/merged WhisperX JSON to `work/<song>/captions/whisperx/<song>-selected-merged.json` and convert that file into `work/<song>/captions/words/<song>-words.json`.
 
 Convert WhisperX JSON into the existing generator's expected whisper.cpp-like word JSON:
 
@@ -137,7 +137,7 @@ work/<song>/captions/words/<song>-words.json
 ```
 
 Conversion rules:
-- Read the merged chunked WhisperX `segments[].words[]` from `work/<song>/captions/whisperx/<song>-chunked-merged.json`.
+- Read the selected full-song/experiment WhisperX `segments[].words[]` from `work/<song>/captions/whisperx/<song>-selected-merged.json`.
 - For each word with `start` and `end`, create a token/word timing entry compatible with the caption generator.
 - Preserve word text and score/probability if available.
 - Convert seconds to the generator's expected offset format. Existing whisper.cpp JSON uses milliseconds in `offsets.from` / `offsets.to`; preserve that convention.
@@ -212,7 +212,7 @@ Rules:
 
 Known caveat:
 - Some high-energy sections can still have Whisper/DTW times that are early or late. If review frames show a whole phrase clearly early/late, make manual timing overrides in the generator or corrected JSON and document them in `report.md`.
-- Check chunk boundaries during QA. If a lyric line crosses a 60-second boundary, the merged absolute timings should remain monotonic; if WhisperX drops boundary words, interpolate from surrounding trusted lyric timings and document the interpolation.
+- During QA, inspect any passage with many interpolated words or unusually short line durations. If WhisperX drops boundary words, first try additional AI reruns with different WhisperX settings and use the best AI-derived timings. Only interpolate words when all attempted WhisperX runs fail to provide a plausible timing anchor, and document the interpolation.
 
 ## Caption visual behavior
 

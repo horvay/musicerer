@@ -21,7 +21,9 @@ Rules:
 - Judge against:
   - the song-specific failure conditions / quality gates accepted by the user, such as required eye color, maximum limb count, required/forbidden markings, no human faces, continuity constraints, unwanted objects, or other song-specific reject conditions
   - no severe visual glitches
-  - visible hands/fingers are anatomically acceptable when hands are prominent; missing fingers, fused fingers, extra fingers, or badly broken hands on a central/foreground hand are retry-level failures unless the hand is tiny/obscured
+  - videos must not have persistent white speckles/dots, snow-like flecks, salt-and-pepper artifacts, or bright point-noise scattered across frames; if these white dots are visible across the video, reject the attempt even if the scene otherwise follows the prompt
+  - animals must not sprout human anatomy; any cat/animal with a human hand, human fingers, human arm, human foot, or humanoid limb is a reject-level failure
+  - visible human hands/fingers are anatomically acceptable when hands are intentionally present; missing fingers, fused fingers, extra fingers, or badly broken hands on a central/foreground human hand are retry-level failures unless the hand is tiny/obscured
   - no visible watermarks, creator signatures, Patreon/artist marks, captions, subtitles, UI overlays, or logos
   - diegetic text that is naturally part of the scene (for example writing on a sign, map, compass, book, plaque, storefront, sail marking, or prop) is allowed unless it looks like a watermark/signature/logo/overlay or badly harms the story/era
   - still image illustrates the scene lyrics and story beat clearly, emotionally, and coherently
@@ -29,7 +31,7 @@ Rules:
   - still image broadly matches the Flux natural-language `imagePrompt` for composition, subject, setting, camera, lighting, era, and mood, but prompt fidelity is secondary to lyric/story usefulness
   - Flux prompt is natural language, not old tag soup or weighted-parenthesis syntax
   - Flux image prompt does not rely on `imageNegativePrompt`; important absences should be phrased in the positive prompt
-  - video follows the approved still image and LTX `videoPrompt` for motion/camera/environment changes
+  - video follows the approved still image and WAN `videoPrompt` for motion/camera/environment changes
   - dragons or creatures appear only if the scene prompt calls for them
   - central figure gender presentation matches the prompt and stays stable
   - character identity and appearance stay stable: face, exact hair length/style, facial hair, clothing, armor, body shape, species, and role should not visibly transform or swap

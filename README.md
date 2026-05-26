@@ -11,8 +11,8 @@ AGENTS.md                         workspace rules
 .pi/agents/                       project-local music-video agents only
 music-video.config.json           active config
 flux_klein.json                   Flux Klein still-image workflow
-music_vid_comfyui_video.json      LTX image-to-video workflow
-docs/PROMPTING.md                 Flux image + LTX video prompt guide
+video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json  WAN image-to-video workflow
+docs/PROMPTING.md                 Flux image + WAN video prompt guide
 src/cli.ts                        Bun/TypeScript helper CLI
 scripts/transcribe-whisperx.sh    WhisperX transcription wrapper
 work/                             transcript, plans, attempts, approved clips, polish/remaster reports
@@ -22,7 +22,7 @@ deprecated-workflows/             old workflows not used by current config
 
 ## Local transcription with WhisperX
 
-Preferred transcription uses the external `whisperx` CLI. The wrapper defaults to the `large-v3` model and WhisperX's default VAD chunking, writes SRT/TXT/JSON outputs into the song work directory, and copies stable names used by the rest of the workflow:
+Preferred transcription uses the external `whisperx` CLI and is a required first step before planning. The wrapper defaults to the `large-v3` model and WhisperX's default VAD chunking, writes SRT/TXT/JSON outputs into the song work directory, and copies stable names used by the rest of the workflow. The JSON word timings are the authoritative source for scene timing and later captions; do not plan from guessed/interpolated lyric timing when this file is available:
 
 ```text
 work/<song>/transcript.srt
@@ -42,11 +42,11 @@ WHISPERX_MODEL=large-v3 WHISPERX_DEVICE=cuda WHISPERX_COMPUTE_TYPE=float16 bun r
 
 ## Prompt style
 
-See `docs/PROMPTING.md` for the detailed Flux/LTX prompting guide.
+See `docs/PROMPTING.md` for the detailed Flux/WAN prompting guide.
 
 - Flux Klein image prompts are `imagePrompt` values. They are natural-language cinematic still-frame descriptions: subject, action, camera, foreground, midground, background, lighting, weather, mood, era, and composition. For Harbor, do not put style directives in the image prompt because `flux_klein.json` supplies style separately.
 - Flux Klein image generation does not use an image negative prompt in this project. Do not create or rely on `imageNegativePrompt`; phrase essential constraints positively in `imagePrompt`. If Flux keeps adding an unwanted object, stop naming that object and instead describe the desired visible replacement in the relevant foreground/midground/background layer.
-- LTX video prompts are `videoPrompt` values. They are one flowing present-tense cinematic paragraph focused on motion: camera behavior, character action, atmosphere, weather, cloth/hair/environment movement, light changes, and emotional action.
+- WAN video prompts are `videoPrompt` values. They are one flowing present-tense cinematic paragraph focused on motion: camera behavior, character action, atmosphere, weather, cloth/hair/environment movement, light changes, and emotional action.
 - Dragons appear only when a lyric or scene explicitly calls for dragons.
 - Central figures must state gender presentation, exact hair length/style, facial hair when relevant, and setting-appropriate clothing.
 
@@ -62,7 +62,7 @@ The intended flow is Pi-controlled and autonomous:
 6. After 30 image attempts for a scene, select the highest-scored attempt and move forward even if it is below 9.
 7. Move to the next scene's still image only after the current scene has a critic-approved or 30-attempt-selected Flux still.
 8. After **all scenes** have approved/selected still images, start the video pass.
-9. `music-video-clip-maker` creates one LTX video attempt at a time from the approved image, scene by scene in order.
+9. `music-video-clip-maker` creates one WAN video attempt at a time from the approved image, scene by scene in order.
 10. `music-video-critic` extracts 5 frames and approves video attempts at 8+; retry that scene until its video is approved.
 11. After every scene has an approved video, `music-video-polish-editor` runs one scene at a time. It extracts 8 frames, optionally uses FFmpeg to crop/reframe, zoom, retime, grade, repair edges, or add filter-based polish, validates the result, and replaces `work/<song>/clips/000N.mp4` only when the edit improves the clip.
 12. `music-video-editor` renders the clean final 1080p MP4 from approved/polished clips and normalizes audio for YouTube-style delivery.
@@ -117,11 +117,14 @@ bun run render -- --force
 148.inputs.height      Flux Klein scheduler height
 149.inputs.width       Flux latent width
 149.inputs.height      Flux latent height
-3305.inputs.text       LTX video prompt
-2197.inputs.image      approved image input for LTX video workflow
-2196                  VHS_VideoCombine video output
-2277:2249.inputs.value clip seconds
-2277:2506.inputs.value FPS
+129:93.inputs.text     WAN video prompt
+129:89.inputs.text     WAN video negative prompt
+97.inputs.image        approved image input for WAN video workflow
+108                    SaveVideo video output
+129:162.inputs.value   FPS
+
+Current WAN video workflow: `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json`.
+It uses WAN22 Remix GGUF high/low models, 4-step LightX2V LoRAs, `euler_ancestral`, split step 2, CFG 1, and 832x480 generation before polish/editor conforming to 1920x1080.
 ```
 
 See `docs/WORKFLOW.md` for the autonomous loop details. Do not use shell loops to generate unreviewed assets. First approve still images for all scenes one by one, then approve videos for all scenes one by one. After all videos are approved, run the polish editor scene by scene before clean final render. Apply any full-video remaster before burned-in captions.

@@ -1,22 +1,22 @@
 # Prompting guide
 
-This project now uses Flux for still images and LTX for image-to-video.
+This project now uses Flux for still images and WAN 2.2 for image-to-video.
 
 ## Prompt fields
 
 - **Flux Klein image prompt**: `imagePrompt`, wired to `6.inputs.text` in `flux_klein.json`.
-- **LTX video prompt**: `videoPrompt`, wired to `3305.inputs.text` in `music_vid_comfyui_video.json`.
-- **Video negative prompt**: `videoNegativePrompt`, appended to `3200.inputs.value` for LTX video only.
+- **WAN video prompt**: `videoPrompt`, wired to `129:93.inputs.text` in `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json`.
+- **Video negative prompt**: `videoNegativePrompt`, wired to `129:89.inputs.text` for WAN video.
 
 Flux image generation does **not** use image negative prompts in this project. Do not create or rely on `imageNegativePrompt`.
 
 ## Workflow responsibility
 
-- The director writes/revises Flux image prompts and LTX video prompts.
+- The director writes/revises Flux image prompts and WAN video prompts.
 - The clip-maker generates exactly one requested image or video attempt and does not judge quality.
 - The critic inspects the generated asset, scores it, and writes detailed retry guidance when below threshold.
 - Generate and approve all Flux still images first, scene by scene in order. Image attempts are judged primarily by how well they illustrate the scene lyrics/story beat; `imagePrompt` is guidance, not a strict checklist. Images require `9+` approval unless the 30-attempt cap selects the best available attempt.
-- After every scene has an approved still image, generate LTX video attempts scene by scene in order from those approved stills. Video attempts require `8+` approval.
+- After every scene has an approved still image, generate WAN video attempts scene by scene in order from those approved stills. Video attempts require `8+` approval.
 
 ## Flux Klein image prompt best practices
 
@@ -55,9 +55,9 @@ For Harbor, keep this world consistent unless the user changes it:
 - No modern machines, electric lights, neon, asphalt roads, road markings, power lines, plastic, modern clothing, or modern signage visible.
 - Recurring man when present: heroic young man with masculine presentation, muscular build, short dark wavy hair, short dark beard, navy blue raincoat, faded red scarf, off-white shirt, dark trousers, black boots.
 
-## LTX video prompt best practices
+## WAN video prompt best practices
 
-LTX prompts describe motion over time from the approved still image. Use one flowing present-tense cinematic paragraph.
+WAN prompts describe motion over time from the approved still image. Use one flowing present-tense cinematic paragraph. Current WAN generation uses the Remix GGUF high/low models with 4-step LightX2V LoRAs, `euler_ancestral`, split step `2`, CFG `1`, and `832x480` landscape output before editorial conforming.
 
 Include:
 
@@ -66,7 +66,7 @@ Include:
 - character/object action: what changes visibly over the clip
 - emotional beat: dread, resolve, hope, grief, awe
 
-Avoid turning LTX prompts into still-image descriptions. Recap identity only enough to keep continuity.
+Avoid turning WAN prompts into still-image descriptions. Recap identity only enough to keep continuity. For Trinket, explicitly prevent confident walking, high-tail curiosity, humanoid limbs, visible human faces, text, watermarks, white speckles, and mosaic/block breakup when relevant.
 
 ## Director / critic retry loop
 

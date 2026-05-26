@@ -6,10 +6,10 @@
         0
       ],
       "loop_count": 0,
-      "filename_prefix": "video/2026-05-15/230441-LTX23",
-      "format": "video/h265-mp4",
+      "filename_prefix": "video/ltx23-short/attempt",
+      "format": "video/h264-mp4",
       "pix_fmt": "yuv420p",
-      "crf": 20,
+      "crf": 19,
       "save_metadata": true,
       "pingpong": false,
       "save_output": true,
@@ -66,7 +66,7 @@
   },
   "3200": {
     "inputs": {
-      "value": "low quality, worst quality, blurry, flicker, jitter, stutter, shaky frame, warping, morphing, melting, ghosting, temporal artifacts, frame tearing, compression artifacts, bad anatomy, deformed body, extra limbs, missing limbs, bad hands, extra fingers, fused fingers, distorted face, identity shift, gender swap, character morphing, costume changing, inconsistent clothing, duplicate character, extra people, text, captions, subtitles, letters, signature, logo, watermark, modern clothing, guns, vehicles, glowing swords, ugly, unattractive face, grotesque face, bad face, forked sword, trident, spear, polearm, staff weapon, multiple dragons, extra dragons, dragon touching person, dragon wings on person, large breast, huge breast"
+      "value": "white speckles, white dots, white stippling, crawling edge speckles, black-fur speckle noise, salt-and-pepper texture, bright pinprick highlights, glittering line noise, snow-like flecks, glowing particles, halos, orbs, sparkle artifacts, flicker, jitter, stutter, warping, morphing, melting, ghosting, temporal artifacts, frame tearing, compression artifacts, blurry, low quality, bad anatomy, deformed animal, extra limbs, missing limbs, human hands on animals, human fingers on paws, humanoid animal limbs, visible human face, text, captions, subtitles, signature, logo, watermark"
     },
     "class_type": "PrimitiveStringMultiline",
     "_meta": {
@@ -75,9 +75,9 @@
   },
   "3305": {
     "inputs": {
-      "text": "A man lifts his sword into the error as lighting hits his sword. The man is yelling to the sky."
+      "value": "A man lifts his sword into the error as lighting hits his sword. The man is yelling to the sky."
     },
-    "class_type": "ttN text",
+    "class_type": "PrimitiveStringMultiline",
     "_meta": {
       "title": "video_prompt"
     }
@@ -480,7 +480,7 @@
   },
   "2277:2815": {
     "inputs": {
-      "img_compression": 22,
+      "img_compression": 33,
       "image": [
         "2277:2814",
         0
@@ -538,7 +538,7 @@
   },
   "2277:2248": {
     "inputs": {
-      "expression": "(ceil((a * b - 1) / 8) * 8) + 1\n",
+      "expression": "(ceil((min(a, 4) * b - 1) / 8) * 8) + 1\n",
       "values.a": [
         "2277:2249",
         0
@@ -550,16 +550,16 @@
     },
     "class_type": "ComfyMathExpression",
     "_meta": {
-      "title": "Math frames"
+      "title": "Math frames (LTX 2.3 safe cap: max 4s / 97 frames at 24fps)"
     }
   },
   "2277:2249": {
     "inputs": {
-      "value": 12
+      "value": 4
     },
     "class_type": "PrimitiveInt",
     "_meta": {
-      "title": "Video seconds"
+      "title": "Requested seconds (capped to 4s for LTX 2.3 stability)"
     }
   },
   "2277:3037": {
@@ -875,7 +875,7 @@
   "2277:2938": {
     "inputs": {
       "scheduler": "linear_quadratic",
-      "steps": 16,
+      "steps": 8,
       "denoise": 1,
       "model": [
         "2277:2937",
@@ -884,7 +884,7 @@
     },
     "class_type": "BasicScheduler",
     "_meta": {
-      "title": "BasicScheduler ( for more steps)"
+      "title": "BasicScheduler (LTX 2.3 distilled 8-step first stage)"
     }
   },
   "2277:2937": {

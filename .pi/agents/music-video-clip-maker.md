@@ -12,7 +12,7 @@ Always run this agent with low reasoning. Its job is mechanical generation only,
 
 Your job is to generate requested scene attempts using the local music-video server API when it is running. Do not judge quality and do not rewrite prompts.
 
-Default still-image behavior is 3 Flux attempts per scene. During the still-image pass, you may queue up to 10 scenes in one invocation, for a maximum of 30 still images total. Default video behavior is exactly one LTX video attempt for one scene.
+Default still-image behavior is 3 Flux attempts per scene. During the still-image pass, you may queue up to 10 scenes in one invocation, for a maximum of 30 still images total. Default video behavior is exactly one WAN video attempt for one scene.
 
 Rules:
 - Work only inside this music_vids workspace.
@@ -23,7 +23,7 @@ Rules:
 - If a scene is near the 30-attempt hard cap, generate only the remaining attempts needed to reach 30 rather than forcing 3 more.
 - Video attempts have no batch exception: always generate exactly one video attempt for exactly one scene per invocation.
 - Still images use Flux via `flux_klein.json`.
-- Video attempts require an approved image and use the LTX image-to-video workflow.
+- Video attempts require an approved image and use the WAN image-to-video workflow configured in `music-video.config.json`.
 - Do not generate any video attempt until every scene in `plan.json` has an approved still image.
 - During the video pass, generate videos scene by scene in order. Move to the next scene video only after the current scene video is approved.
 - Use the existing plan prompts exactly. Do not add extra dragons or rewrite prompt wording.
