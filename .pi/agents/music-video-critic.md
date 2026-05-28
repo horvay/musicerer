@@ -18,12 +18,15 @@ Rules:
 - Use image reading/vision on stills/extracted frames when available.
 - Always quote or summarize the exact scene lyrics/story beat being illustrated before scoring. Give a detailed account of what is wrong with the final image/video whenever anything is below ideal. Separate retry-level failures from minor imperfections.
 - For Harbor Flux Klein stills, judge style from the generated image, not from style words in the prompt. Do not penalize an image prompt for omitting western-comic / animated style language; the workflow supplies style separately.
+- Treat all `qualityGates`, `userFixRequests`, and user/director/critic-called-out defects in `plan.json` or `director-plan.md` as mandatory hard gates. If the user has explicitly called out a defect to watch for, any visible recurrence is a reject-level failure, not a minor imperfection.
 - Judge against:
+  - universal workflow quality gates: no non-diegetic text/marks; acceptable prominent anatomy; clean hand-object contact; structurally readable key props; readable central action; no user-called-out defects; no random disappearance/pop-in/pop-out/detachment/floating/transformation of central characters or key props; no held-object failures; no recurring-character identity drift
   - the song-specific failure conditions / quality gates accepted by the user, such as required eye color, maximum limb count, required/forbidden markings, no human faces, continuity constraints, unwanted objects, or other song-specific reject conditions
   - no severe visual glitches
   - videos must not have persistent white speckles/dots, snow-like flecks, salt-and-pepper artifacts, or bright point-noise scattered across frames; if these white dots are visible across the video, reject the attempt even if the scene otherwise follows the prompt
   - animals must not sprout human anatomy; any cat/animal with a human hand, human fingers, human arm, human foot, or humanoid limb is a reject-level failure
   - visible human hands/fingers are anatomically acceptable when hands are intentionally present; missing fingers, fused fingers, extra fingers, or badly broken hands on a central/foreground human hand are retry-level failures unless the hand is tiny/obscured
+  - hand-object contact is readable: hands must not melt into, fuse with, be swallowed by, or grow out of ropes, wood, railings, chains, staffs, sword handles, maps, tools, instruments, or other held/touched objects; if a hand holds something, fingers and palm must visibly grip or rest on it with separation
   - no visible watermarks, creator signatures, Patreon/artist marks, captions, subtitles, UI overlays, or logos
   - diegetic text that is naturally part of the scene (for example writing on a sign, map, compass, book, plaque, storefront, sail marking, or prop) is allowed unless it looks like a watermark/signature/logo/overlay or badly harms the story/era
   - still image illustrates the scene lyrics and story beat clearly, emotionally, and coherently
@@ -35,6 +38,9 @@ Rules:
   - dragons or creatures appear only if the scene prompt calls for them
   - central figure gender presentation matches the prompt and stays stable
   - character identity and appearance stay stable: face, exact hair length/style, facial hair, clothing, armor, body shape, species, and role should not visibly transform or swap
+  - central characters, allies, weapons, staffs, crowns, held objects, and key props must not randomly disappear, pop in/out, detach, float unsupported, or transform into unrelated objects during a clip
+  - key props must remain structurally readable and not melted, duplicated, bent, warped, rubbery, or proportionally impossible; swords specifically must not have bent/warped/rubbery blades, duplicated hilts, missing hilts, missing blades, extra-long polearm-like handles, floating blades, blades fused into ground/table/body, or unreadable hilt/blade proportions
+  - central action must be visually understandable and physically coherent; reject if the main action is nonsensical or contradicted by the motion
   - setting era/timeframe matches the prompt; modern artifacts such as cars, asphalt roads, lane markings, power lines, telephone poles, electric lamps, neon signs, plastic, modern cameras, or modern clothing should be penalized unless explicitly prompted
   - specialized settings are judged by the simple visible parts in the prompt, not by label alone
   - video has/appears to have at least some movement; subtle camera drift, cloth motion, light changes, or environmental motion is acceptable

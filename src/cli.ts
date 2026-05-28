@@ -79,6 +79,7 @@ type Segment = {
 type ImageAttempt = {
   attempt: number;
   image: string;
+  seed?: number;
   score?: number;
   report?: string;
 };
@@ -87,6 +88,7 @@ type ClipAttempt = {
   attempt: number;
   clip: string;
   image?: string;
+  seed?: number;
   score?: number;
   report?: string;
 };
@@ -461,10 +463,17 @@ function randomSeed() {
   return Math.floor(Math.random() * 1_000_000_000_000_000);
 }
 
-function sceneSeed(scene: Scene, mode: "image" | "video", seedOverride?: number) {
+function sceneSeed(scene: Scene, mode: "image" | "video", seedOverride?: number, attempt?: number) {
   if (Number.isFinite(seedOverride)) return seedOverride!;
   const seed = mode === "video" ? scene.videoSeed ?? scene.seed : scene.imageSeed ?? scene.seed;
-  return Number.isFinite(seed) ? seed! : randomSeed();
+  const baseSeed = Number.isFinite(seed) ? seed! : randomSeed();
+  if (!Number.isFinite(attempt) || attempt! <= 1) return baseSeed;
+  // Keep attempts deterministic per scene while ensuring queued batches produce distinct images.
+  return (baseSeed + attempt! * 1_000_003) % 1_000_000_000_000_000;
+}
+
+function workflowSeed(scene: Scene, mode: "image" | "video", seedOverride?: number, attempt?: number) {
+  return sceneSeed(scene, mode, seedOverride, attempt);
 }
 
 function appendNegativePrompt(workflow: Json, path: string | undefined, extra: string | undefined) {
@@ -475,10 +484,10 @@ function appendNegativePrompt(workflow: Json, path: string | undefined, extra: s
   setByPath(workflow, path, `${current}${separator}${extra.trim()}`);
 }
 
-function patchWorkflow(config: Config, plan: Plan, scene: Scene, mode: "image" | "video", inputImageName?: string, seedOverride?: number) {
+function patchWorkflow(config: Config, plan: Plan, scene: Scene, mode: "image" | "video", inputImageName?: string, seedOverride?: number, attempt?: number) {
   const comfy = config.comfy;
   const workflow = readJson<Json>(comfyWorkflowPath(config, mode));
-  const seed = sceneSeed(scene, mode, seedOverride);
+  const seed = workflowSeed(scene, mode, seedOverride, attempt);
 
   if (mode === "image" && comfy?.imagePromptPath) setByPath(workflow, comfy.imagePromptPath, scene.imagePrompt);
   if (mode === "video" && comfy?.videoPromptPath) setByPath(workflow, comfy.videoPromptPath, scene.videoPrompt);
@@ -641,7 +650,8 @@ async function generateImageAttempt(config: Config, plan: Plan, scene: Scene, at
 
   const baseUrl = await ensureComfy(config);
   console.log(`ComfyUI image scene ${scene.index + 1}/${plan.scenes.length}, attempt ${attempt}: ${secondsToClock(scene.start)} ${scene.lyrics.slice(0, 80)}`);
-  const workflow = patchWorkflow(config, plan, scene, "image", undefined, seedOverride);
+  const attemptSeed = workflowSeed(scene, "image", seedOverride, attempt);
+  const workflow = patchWorkflow(config, plan, scene, "image", undefined, attemptSeed, attempt);
   const promptId = await comfyQueue(baseUrl, workflow);
   const history = await comfyHistory(baseUrl, promptId);
   const output = firstComfyImage(history, config.comfy?.imageOutputNodeId ?? config.comfy?.referenceImageNodeId ?? config.comfy?.outputNodeId);
@@ -651,7 +661,7 @@ async function generateImageAttempt(config: Config, plan: Plan, scene: Scene, at
 
   scene.imageAttempts = scene.imageAttempts ?? [];
   const previous = scene.imageAttempts.findIndex((item) => item.attempt === attempt);
-  const item = { attempt, image: target };
+  const item = { attempt, image: target, seed: attemptSeed };
   if (previous >= 0) scene.imageAttempts[previous] = { ...scene.imageAttempts[previous], ...item };
   else scene.imageAttempts.push(item);
   writeJson(planPath, plan);
@@ -693,7 +703,8 @@ async function generateClipAttempt(config: Config, plan: Plan, scene: Scene, att
   const baseUrl = await ensureComfy(config);
   const inputImageName = prepareComfyInputImage(config, plan, scene);
   console.log(`ComfyUI video scene ${scene.index + 1}/${plan.scenes.length}, attempt ${attempt}: ${secondsToClock(scene.start)} ${scene.lyrics.slice(0, 80)}`);
-  const workflow = patchWorkflow(config, plan, scene, "video", inputImageName);
+  const attemptSeed = workflowSeed(scene, "video", undefined, attempt);
+  const workflow = patchWorkflow(config, plan, scene, "video", inputImageName, attemptSeed, attempt);
   const promptId = await comfyQueue(baseUrl, workflow);
   const history = await comfyHistory(baseUrl, promptId);
   const output = firstComfyOutput(history, config.comfy?.outputNodeId);
@@ -702,7 +713,7 @@ async function generateClipAttempt(config: Config, plan: Plan, scene: Scene, att
 
   scene.attempts = scene.attempts ?? [];
   const previous = scene.attempts.findIndex((item) => item.attempt === attempt);
-  const item = { attempt, clip: target, image: approvedImage(scene) };
+  const item = { attempt, clip: target, image: approvedImage(scene), seed: attemptSeed };
   if (previous >= 0) scene.attempts[previous] = { ...scene.attempts[previous], ...item };
   else scene.attempts.push(item);
   scene.clip = target;
@@ -776,11 +787,9 @@ function ffmpegClipFilter(plan: Plan, clipDurations: number[]) {
   for (const scene of plan.scenes) {
     const sourceDuration = Math.max(0.1, clipDurations[scene.index] ?? scene.clipDuration ?? desiredDurations[scene.index] ?? 1);
     const desiredDuration = desiredDurations[scene.index] ?? sourceDuration;
-    const base = `scale=${outputWidth}:${outputHeight}:force_original_aspect_ratio=increase,crop=${outputWidth}:${outputHeight},setsar=1,fps=${plan.fps},format=yuv420p`;
+    const base = `scale=${outputWidth}:${outputHeight}:force_original_aspect_ratio=increase,crop=${outputWidth}:${outputHeight},setsar=1,format=yuv420p`;
     const stretchFactor = desiredDuration / sourceDuration;
-    const durationFilter = stretchFactor > 1.01
-      ? `setpts=${stretchFactor.toFixed(6)}*PTS,minterpolate=fps=${plan.fps}:mi_mode=mci:mc_mode=aobmc:me_mode=bidir:vsbmc=1,trim=duration=${desiredDuration.toFixed(3)},setpts=PTS-STARTPTS`
-      : `setpts=${stretchFactor.toFixed(6)}*PTS,trim=duration=${desiredDuration.toFixed(3)},setpts=PTS-STARTPTS`;
+    const durationFilter = `setpts=${stretchFactor.toFixed(6)}*PTS,fps=${plan.fps},tpad=stop_mode=clone:stop_duration=${desiredDuration.toFixed(3)},trim=duration=${desiredDuration.toFixed(3)},setpts=PTS-STARTPTS`;
     filters.push(`[${scene.index}:v]${base},${durationFilter}[v${scene.index}]`);
   }
 
@@ -914,7 +923,7 @@ function commandRender(config: Config, flags: Map<string, string | boolean>) {
     "-crf", "18",
     "-r", String(plan.fps),
     "-pix_fmt", "yuv420p",
-    "-af", "volume=1.3dB",
+    "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
     "-c:a", "aac",
     "-b:a", "320k",
     "-movflags", "+faststart",

@@ -16,7 +16,7 @@ Default still-image behavior is 3 Flux attempts per scene. During the still-imag
 
 Rules:
 - Work only inside this music_vids workspace.
-- Read `AGENTS.md`, `docs/PROMPTING.md`, `music-video.config.json`, and `work/*/plan.json`.
+- Read `AGENTS.md` and `music-video.config.json` only as needed for mechanics. Do not read or quote full scene prompt text unless diagnosing a generation/config failure. The server/CLI is responsible for reading `work/*/plan.json` and patching the prompt directly into the ComfyUI workflow.
 - Use the requested scene number(s), attempt number(s), batch size, and attempt type from the task.
 - For still images, generate exactly 3 Flux attempts per requested scene by default. If explicit attempt numbers are not provided, determine the next available consecutive image attempt numbers for each scene by listing `work/<song>/attempts/scene-####/image-attempt-*.png`; do not overwrite existing attempts unless the task explicitly says force/regenerate.
 - During the still-image pass, you may process up to 10 scenes in one invocation, for a maximum of 30 still images total. Generate sequentially, not concurrently: finish attempt N for a scene before attempt N+1, and finish one scene's requested stills before moving to the next queued scene.
@@ -26,7 +26,7 @@ Rules:
 - Video attempts require an approved image and use the WAN image-to-video workflow configured in `music-video.config.json`.
 - Do not generate any video attempt until every scene in `plan.json` has an approved still image.
 - During the video pass, generate videos scene by scene in order. Move to the next scene video only after the current scene video is approved.
-- Use the existing plan prompts exactly. Do not add extra dragons or rewrite prompt wording.
+- Use the existing plan prompts exactly by invoking the server/CLI with scene and attempt numbers; do not manually copy, inspect, add to, summarize, or rewrite prompt wording during normal generation.
 - Flux image generation has no image negative prompt in this project; ignore any old `imageNegativePrompt` fields if encountered and report that the director should remove them.
 - Prefer the running server at `http://127.0.0.1:3030` for generation. Use `POST /image` and `POST /clip`.
 - For still-image batches, post and wait for each image sequentially: generate attempt N, confirm its output file exists, then generate attempt N+1. Do not fire multiple ComfyUI jobs concurrently. When multiple scenes are queued, finish all requested still attempts for one scene before moving to the next scene.
