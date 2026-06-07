@@ -78,9 +78,9 @@ for (const line of lines) {
 }
 
 mkdirSync(dirname(outJson), { recursive: true });
-writeFileSync(outJson, JSON.stringify({ audio: 'freedom.wav', lines: aligned }, null, 2) + '\n');
+writeFileSync(outJson, JSON.stringify({ workDir, canonicalPath, transcriptPath, lines: aligned }, null, 2) + '\n');
 writeFileSync(outSrt, aligned.map((l, idx) => `${idx + 1}\n${timestamp(l.start)} --> ${timestamp(l.end)}\n${l.text}\n`).join('\n'));
-const report: string[] = ['# Freedom transcript alignment report', '', `Canonical source: \`${canonicalPath}\``, `WhisperX source: \`${transcriptPath}\``, '', `Matched canonical words to WhisperX timings: ${matchedCount}`, `Interpolated/missing canonical words: ${interpolatedCount}`, `Canonical lines with no direct WhisperX word matches: ${unmatchedLines}`, '', '## Lines with notable interpolation', ''];
+const report: string[] = ['# Transcript alignment report', '', `Work directory: \`${workDir}\``, `Canonical source: \`${canonicalPath}\``, `WhisperX source: \`${transcriptPath}\``, '', `Matched canonical words to WhisperX timings: ${matchedCount}`, `Interpolated/missing canonical words: ${interpolatedCount}`, `Canonical lines with no direct WhisperX word matches: ${unmatchedLines}`, '', '## Lines with notable interpolation', ''];
 for (const l of aligned) { const interp = l.words.filter(w => w.source === 'interpolated'); if (interp.length) report.push(`- ${timestamp(l.start)} → ${timestamp(l.end)} — ${l.text}\n  - interpolated: ${interp.map(w => w.word).join(', ')}`); }
 report.push('', '## Notes', '', '- Used global sequence alignment against all WhisperX word timings so repeated choruses do not drift past the real vocal ending.', '- Canonical lyrics are treated as text truth; WhisperX provides timing anchors where it recognized words.', '- Interpolated words are approximate and should be reviewed during final captioning.');
 writeFileSync(outReport, report.join('\n') + '\n');

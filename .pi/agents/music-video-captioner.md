@@ -20,7 +20,8 @@ Work only inside this `music_vids` workspace.
 - Captioning happens after `music-video-remaster` when a remaster pass is part of the flow. Do not apply full-video remaster effects during captioning.
 - Default captioned output is a sibling file named `<stem>-captioned.mp4`, for example `output/harbor-remastered-captioned.mp4` when the input is `output/harbor-remastered.mp4`, or `output/harbor-captioned.mp4` when no remaster exists.
 - Final captioned video must remain `1920x1080`, H.264, `yuv420p`, 24fps, with audio present.
-- Use local Whisper/whisper.cpp. Do not add Python project code.
+- Use local WhisperX/Whisper tooling. Do not add Python project code.
+- For sung lyric music videos, prefer an isolated vocals stem for caption timing when available; mixed full-track audio can make WhisperX word timings drift badly, especially in loud or repeated choruses.
 - Use the project font if available: `OldMasterRegular-7OqlK.ttf` / font family `Old Master`.
 - Keep caption artifacts in `work/<song>/captions/`.
 - Always extract review frames/contact sheets from the captioned render and inspect them directly.
@@ -77,7 +78,7 @@ Use timestamped or descriptive review folders when iterating, e.g. `review-endti
 
 ## Whisper timing extraction
 
-Whisper cannot read MP4 directly in this workflow. Extract mono 16k WAV first:
+Whisper cannot read MP4 directly in this workflow. First check whether the user provided an isolated vocals stem for the same song/video. If a vocals-only stem exists (for example `*_vocals.wav`, `vocals.wav`, or a user-supplied attachment), use it as the primary caption timing audio after confirming it has the same duration/timebase as the final video. If no vocals stem exists, extract mono 16k WAV from the clean final MP4:
 
 ```bash
 mkdir -p work/<song>/captions/words work/<song>/captions/chunks/minute-wav work/<song>/captions/chunks/words
@@ -87,9 +88,15 @@ ffmpeg -hide_banner -y \
   work/<song>/captions/<song>-final-audio.wav
 ```
 
-### Required timing method: full-song WhisperX `large-v3` float32 first, with AI rerun fallback
+### Required timing method: vocals stem when available, otherwise full-song WhisperX `large-v3` float32 first
 
-Use WhisperX as the preferred timing source. First run WhisperX on the full extracted WAV with `large-v3`, CPU, and `float32`; this is slower but proved more accurate for difficult sung lyric passages than chunked CPU/int8 runs. Do not default to scene interpolation or manual guessed timing when WhisperX misses a passage.
+Use WhisperX as the preferred timing source. For sung lyrics, the best source is usually a time-identical isolated vocals stem, not the mixed final MP4 audio. Run WhisperX on the full vocals stem when available; otherwise run it on the full extracted final-audio WAV. Use `large-v3`, CPU, and `float32`; this is slower but proved more accurate for difficult sung lyric passages than chunked CPU/int8 runs. Do not default to scene interpolation or manual guessed timing when WhisperX misses a passage.
+
+Before running WhisperX, document which audio was used:
+- `vocals-only`: user-provided or discovered isolated vocal stem, duration/timebase checked against final MP4.
+- `mixed-final`: audio extracted from the clean final/remastered MP4.
+
+If both exist and the mixed-final timing looks bad, switch to the vocals-only stem and regenerate timings rather than manually patching large sections.
 
 If the first full-song pass drops/mangles a lyric passage, run at least two additional WhisperX passes with radically different settings (for example `small`/`int8` and `medium`/`int8`, or a GPU/float16 pass if available), compare the word timings around the failed passage, and use the best AI-derived timings. Document which run supplied each repaired passage.
 
@@ -128,6 +135,7 @@ Notes:
 - Primary timing source is `--model large-v3 --device cpu --compute_type float32 --batch_size 4` unless a different WhisperX run clearly aligns a specific passage better.
 - WhisperX may download Python packages and a wav2vec2 alignment model into user caches on first run.
 - WhisperX may still mishear lyrics. That is acceptable because displayed text comes from the trusted lyric script; WhisperX is only the timing source.
+- Ignore obvious non-lyric hallucinations/artifacts such as a spurious outro `Bye.` unless present in the trusted lyric script.
 - Write the selected/merged WhisperX JSON to `work/<song>/captions/whisperx/<song>-selected-merged.json` and convert that file into `work/<song>/captions/words/<song>-words.json`.
 
 Convert WhisperX JSON into the existing generator's expected whisper.cpp-like word JSON:
@@ -194,9 +202,9 @@ Keep the first real segment.
 
 This prevents the aligner from choosing unusable zero-duration duplicate word timings.
 
-## Word reveal timing rule
+## Word reveal and ASS event timing rule
 
-Use DTW-improved Whisper word begin times as the normal reveal timing signal.
+Use WhisperX word begin times as the normal reveal timing signal.
 
 For each corrected lyric word after alignment:
 
@@ -210,9 +218,15 @@ Rules:
 - If a token is non-monotonic or zero-duration (`start >= end`), clamp the reveal just before the word end.
 - Preserve `start`, `revealStart`, and `end` in the corrected timings JSON for debugging.
 
+ASS event timing:
+- Use one Dialogue event per trusted lyric line, but do **not** trust old line end windows to decide when the event disappears.
+- Set each event start from the first word timing minus a small lead-in.
+- Set each event end from the last word reveal/end plus enough padding for the pop/settle animation, normally at least `lastRevealStart + 0.8–1.0s` and `lastWordEnd + 0.6–0.9s`.
+- This prevents the known failure where a line appears for a split second because the Dialogue event ends before later word reveal tags fire.
+
 Known caveat:
-- Some high-energy sections can still have Whisper/DTW times that are early or late. If review frames show a whole phrase clearly early/late, make manual timing overrides in the generator or corrected JSON and document them in `report.md`.
-- During QA, inspect any passage with many interpolated words or unusually short line durations. If WhisperX drops boundary words, first try additional AI reruns with different WhisperX settings and use the best AI-derived timings. Only interpolate words when all attempted WhisperX runs fail to provide a plausible timing anchor, and document the interpolation.
+- Some high-energy sections can still have WhisperX times that are early or late. If review shows a phrase clearly early/late, first rerun WhisperX on a short ±10s segment around the problem or on an isolated vocals stem if available. Make minimal manual timing overrides only after AI-derived timing sources fail, and document them in `report.md`.
+- During QA, inspect any passage with many interpolated words, unusually short line durations, non-monotonic word times, or repeated chorus text. If WhisperX drops boundary words, first try additional AI reruns with different WhisperX settings and use the best AI-derived timings. Only interpolate words when all attempted WhisperX runs fail to provide a plausible timing anchor, and document the interpolation.
 
 ## Caption visual behavior
 
@@ -402,8 +416,9 @@ Check:
 - words appear word-by-word
 - full lyric line remains visible while words reveal
 - no large unwanted impact title text
-- timing is acceptable
-- repeated phrases did not align to duplicate zero-duration Whisper segments
+- timing is acceptable in playback, not just contact sheets
+- ASS event end times do not clip later word reveals
+- repeated phrases did not align to the wrong chorus/refrain occurrence or to duplicate zero-duration Whisper segments
 
 If a problem is found:
 1. Identify whether it is style, placement, wrapping, or timing.

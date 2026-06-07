@@ -13,11 +13,11 @@ Your job is to review generated still-image batches or one generated video attem
 Rules:
 - Work only inside this music_vids workspace.
 - Read `AGENTS.md`, `docs/PROMPTING.md`, `music-video.config.json`, the relevant scene in `work/*/plan.json`, and any song-specific failure conditions / quality gates in `plan.json` or `work/<song>/director-plan.md`.
-- For Flux image attempts: inspect all generated still images for the scene directly, normally 3 attempts at a time, and judge each primarily by how well it illustrates the scene's lyrics and story beat. The `imagePrompt` is guidance, not a strict checklist.
+- For still-image attempts, whether local Flux or ChatGPT/OpenAI web images: inspect all generated still images for the scene directly, normally 3 attempts at a time, and judge each primarily by how well it illustrates the scene's lyrics and story beat. The `imagePrompt` is guidance, not a strict checklist.
 - For a video attempt: extract 5 frames and judge the single video against the approved image, `imagePrompt`, and `videoPrompt`.
 - Use image reading/vision on stills/extracted frames when available.
 - Always quote or summarize the exact scene lyrics/story beat being illustrated before scoring. Give a detailed account of what is wrong with the final image/video whenever anything is below ideal. Separate retry-level failures from minor imperfections.
-- For Harbor Flux Klein stills, judge style from the generated image, not from style words in the prompt. Do not penalize an image prompt for omitting western-comic / animated style language; the workflow supplies style separately.
+- For Harbor local Flux Klein stills, judge style from the generated image, not from style words in the prompt. Do not penalize an image prompt for omitting western-comic / animated style language; the local workflow supplies style separately. For ChatGPT/OpenAI web stills, judge the visible result against the project theme/visual style wrapper plus the scene `imagePrompt`.
 - Treat all `qualityGates`, `userFixRequests`, and user/director/critic-called-out defects in `plan.json` or `director-plan.md` as mandatory hard gates. If the user has explicitly called out a defect to watch for, any visible recurrence is a reject-level failure, not a minor imperfection.
 - Judge against:
   - universal workflow quality gates: no non-diegetic text/marks; acceptable prominent anatomy; clean hand-object contact; structurally readable key props; readable central action; no user-called-out defects; no random disappearance/pop-in/pop-out/detachment/floating/transformation of central characters or key props; no held-object failures; no recurring-character identity drift
@@ -31,9 +31,9 @@ Rules:
   - diegetic text that is naturally part of the scene (for example writing on a sign, map, compass, book, plaque, storefront, sail marking, or prop) is allowed unless it looks like a watermark/signature/logo/overlay or badly harms the story/era
   - still image illustrates the scene lyrics and story beat clearly, emotionally, and coherently
   - Harbor still image has the intended stylized animated/comic look from the workflow, even though the image prompt should not contain style directives
-  - still image broadly matches the Flux natural-language `imagePrompt` for composition, subject, setting, camera, lighting, era, and mood, but prompt fidelity is secondary to lyric/story usefulness
-  - Flux prompt is natural language, not old tag soup or weighted-parenthesis syntax
-  - Flux image prompt does not rely on `imageNegativePrompt`; important absences should be phrased in the positive prompt
+  - still image broadly matches the natural-language `imagePrompt` for composition, subject, setting, camera, lighting, era, and mood, but prompt fidelity is secondary to lyric/story usefulness
+  - still-image prompt is natural language, not old tag soup or weighted-parenthesis syntax
+  - still-image prompt does not rely on `imageNegativePrompt`; important absences should be phrased in the positive prompt
   - video follows the approved still image and WAN `videoPrompt` for motion/camera/environment changes
   - dragons or creatures appear only if the scene prompt calls for them
   - central figure gender presentation matches the prompt and stays stable

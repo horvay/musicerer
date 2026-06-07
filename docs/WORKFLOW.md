@@ -2,8 +2,10 @@
 
 ## Agents
 
-- `music-video-director` — creates/revises the lyric-aware visual plan and Flux/WAN prompts.
-- `music-video-clip-maker` — generates still-image batches of 3 Flux attempts per scene, optionally queued for up to 10 scenes at a time during the still pass; generates exactly one requested WAN video attempt.
+- `music-video-director` — creates/revises the lyric-aware visual plan and still/WAN prompts.
+- `music-video-clip-maker` — generates local still-image batches of 3 Flux attempts per scene, optionally queued for up to 10 scenes at a time during the still pass; generates exactly one requested WAN video attempt.
+- `openai-maker` — when explicitly selected by the user, generates still-image attempts through the ChatGPT/OpenAI web UI using Playwright MCP and the user's logged-in subscription instead of local image models.
+- `grok-maker` — when explicitly selected by the user, animates approved still images into video attempts through Grok Imagine using Playwright MCP and the user's logged-in Grok/xAI account instead of local WAN.
 - `music-video-critic` — reviews generated images/videos, scores them, approves accepted attempts, and writes retry guidance.
 - `music-video-polish-editor` — after all scene videos are approved, optionally polishes one approved clip at a time with FFmpeg by inspecting frames, cropping/reframing, grading, retiming, and validating the result.
 - `music-video-editor` — renders approved/polished clips into the clean final MP4.
@@ -11,8 +13,10 @@
 
 ## Current generation stack
 
-- Still images: `flux_klein.json` using Flux Klein.
-- Image-to-video: `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json` using WAN 2.2 from the approved Flux still.
+- Default local still images: `flux_klein.json` using Flux Klein.
+- Optional user-selected web still images: ChatGPT/OpenAI image generation through the web chat interface, driven only by `openai-maker` with Playwright MCP.
+- Default local image-to-video: `video_wan2_2_14B_i2v_default_remix_gguf_4step_lora_eulera_landscape.json` using WAN 2.2 from the approved still.
+- Optional user-selected web image-to-video: Grok Imagine through the web interface, driven only by `grok-maker` with Playwright MCP.
 - WAN video stack: Remix GGUF high/low models, 4-step LightX2V LoRAs enabled, `euler_ancestral`, split step `2`, CFG `1`, and `832x480` generation before polish/editor conforming.
 - Flux image prompts are natural-language `imagePrompt` values at `6.inputs.text`.
 - There is no image negative prompt for Flux. Do not use `imageNegativePrompt`.
@@ -20,7 +24,7 @@
 
 ## Autonomous loop
 
-Work in controlled agent batches. During still-image generation only, the clip-maker may queue up to 10 scenes in one invocation, generating 3 still attempts per scene for a maximum of 30 still images total. Video generation, retries after critique, polish, rendering, remastering, and captions remain ordered agent-controlled work; do not use ad hoc shell loops outside the clip-maker's documented still queue.
+Work in controlled agent batches. During still-image generation only, the selected still maker may queue up to 10 scenes in one invocation, generating 3 still attempts per scene for a maximum of 30 still images total. Use `music-video-clip-maker` for the default local Flux route; use `openai-maker` only when the user explicitly selects the ChatGPT/OpenAI web route. During image-to-video generation, use `music-video-clip-maker` for the default local WAN route; use `grok-maker` only when the user explicitly selects the Grok Imagine web route. Video generation, retries after critique, polish, rendering, remastering, and captions remain ordered agent-controlled work; do not use ad hoc shell loops outside the documented maker queues.
 
 The director should validate new plans against any user-stated clip-duration range. The range is literal and inclusive when creating or revising a plan: if the user requests `4-12 second clips`, aim for `clipDuration >= 4.0` and `clipDuration <= 12.0`, and do not substitute defaults such as 8-12 seconds. However, do not block generation solely because an existing plan has longer clips; assume the user may have intentionally allowed or accepted them unless they explicitly ask for a timing fix.
 
@@ -46,7 +50,7 @@ work/<song>/transcript.json
 
 The plan must use `transcript.json` word timings, aligned to the corrected/trusted lyric text when WhisperX mishears words. Before planning, compare the WhisperX transcript against the user-provided/canonical lyrics and create corrected alignment artifacts when they differ. When important words or phrase endings are missing/low-confidence, run targeted WhisperX retries on short clipped time ranges around the expected words, optionally with alternate compute/batch settings or boosted audio, then merge any recovered word timings into the corrected alignment before falling back to interpolation. Scene starts/ends should be derived from real word/phrase timings, not guessed from rough song sections or later interpolated caption timings. If WhisperX drops, merges, or misrecognizes words even after targeted retries, locally interpolate only those missing words between adjacent aligned words and document the caveat in `director-plan.md` or a dedicated transcript-alignment report.
 
-### Phase 0 — user concept, scene outline, and song-specific failure conditions
+### Phase 0 — user concept, generation methods, scene outline, and song-specific failure conditions
 
 Every project must include these universal quality gates before any song-specific gates are added:
 
@@ -62,32 +66,60 @@ Every project must include these universal quality gates before any song-specifi
 
 Before finalizing prompts or generating assets for a new song, ask the user what should be in the video in general: the desired story, recurring characters, setting, mood, symbols, things to emphasize, and things to avoid. Use the user's answer as the creative brief.
 
-Then create a simple scene-by-scene breakout for user approval before writing the full generation plan. This breakout should be concise bullets in order, describing what each scene shows at a story/visual level without final Flux/WAN prompt detail. Do not proceed to full prompts, still generation, or video generation until the user approves or revises this outline.
+Also ask the user which generation methods to use and record the answer before any asset generation begins:
+
+1. Still-image method:
+   - `local-flux` — default local Flux via `music-video-clip-maker`.
+   - `openai-web` — ChatGPT/OpenAI web image generation via `openai-maker` and Playwright MCP.
+2. Image-to-video method:
+   - `local-wan` — default local WAN via `music-video-clip-maker`.
+   - `grok-web` — Grok Imagine web animation via `grok-maker` and Playwright MCP.
+
+Store the selected methods in `work/<song>/director-plan.md` and in `work/<song>/plan.json` under `generationMethods`, for example:
+
+```json
+{
+  "generationMethods": {
+    "stillImages": "openai-web",
+    "imageToVideo": "grok-web",
+    "decidedBy": "user",
+    "notes": "Use ChatGPT/OpenAI for stills and Grok Imagine for animation."
+  }
+}
+```
+
+Do not infer the web routes from casual discussion or one-off tests; use default `local-flux` and `local-wan` unless the user explicitly chooses otherwise or confirms the stored choices.
+
+Then create a simple scene-by-scene breakout for user approval before writing the full generation plan. This breakout should be concise bullets in order, describing what each scene shows at a story/visual level without final still/WAN prompt detail. Do not proceed to full prompts, still generation, or video generation until the user approves or revises this outline.
+
+Before writing full prompts, run the visual storycraft pass in `docs/VISUAL_STORYCRAFT.md`: define the central visual question/emotional arc, create a small motif ledger, ensure every scene changes something, connect adjacent scenes by causation or contrast rather than simple sequence, and plan a varied wide/medium/close/insert shot rhythm. Record the storycraft notes in `work/<song>/director-plan.md` so later prompt revisions preserve the intended arc.
 
 Also ask the user for a short list of song-specific failure conditions / quality gates. Give exactly 5 concrete suggestions tailored to the current song so the user can accept, reject, or edit them. Examples include wrong eye color, too many legs, incorrect species/markings, unwanted human faces, modern artifacts, bad foreground hands, unwanted text/logos, or continuity breaks.
 
-Record the approved creative brief, approved scene breakout, and accepted quality gates in `work/<song>/director-plan.md` and, when practical, in `work/<song>/plan.json` under `qualityGates`. The critic must read and enforce these conditions during still and video review.
+Record the approved creative brief, approved generation methods, approved scene breakout, and accepted quality gates in `work/<song>/director-plan.md`; also record generation methods in `work/<song>/plan.json` under `generationMethods` and quality gates under `qualityGates` when practical. The orchestrator and makers must follow the stored generation methods, and the critic must read and enforce the quality gates during still and video review.
 
 ### Phase 1 — still-image pass
 
-1. Director writes or revises the scene's Flux `imagePrompt`, with scene timing already validated against the user's requested clip-duration range.
-2. Clip-maker generates 3 Flux still-image attempts per scene. It may queue up to 10 scenes in one invocation during the still pass, for a maximum of 30 still images total. Attempts should be created sequentially and tracked per scene.
-   ```bash
-   bun run video image -- --scene <N> --attempt <A>
-   ```
+1. Director writes or revises the scene's natural-language `imagePrompt`, with scene timing already validated against the user's requested clip-duration range.
+2. The still maker selected in `plan.json` `generationMethods.stillImages` generates 3 still-image attempts per scene. It may queue up to 10 scenes in one invocation during the still pass, for a maximum of 30 still images total. Attempts should be created sequentially and tracked per scene.
+   - Default local route: `music-video-clip-maker` runs Flux through the existing API/CLI.
+     ```bash
+     bun run video image -- --scene <N> --attempt <A>
+     ```
+   - User-selected web route: `openai-maker` opens ChatGPT/OpenAI with Playwright MCP, generates the image through the web chat UI, saves it to `work/<song>/attempts/scene-####/image-attempt-A.png`, then registers it with `scripts/register-web-image-attempt.ts`.
 3. Critic inspects each scene's 3 still images directly and scores each 1-10, primarily by how well each still illustrates the scene lyrics/story beat. The prompt is guidance, not a strict checklist.
 4. If any still for a scene scores `9+`, critic runs `approve-image` for the best accepted still and the workflow advances that scene.
-5. If all 3 stills for a scene score below `9`, critic writes a detailed comparative failure report tied to the lyrics/story beat. Director revises that scene's Flux prompt using the report, then clip-maker generates the next 3 attempts for that scene.
+5. If all 3 stills for a scene score below `9`, critic writes a detailed comparative failure report tied to the lyrics/story beat. Director revises that scene's still-image prompt using the report, then the selected still maker generates the next 3 attempts for that scene.
 6. Hard cap: after 30 image attempts for a scene, stop retrying. Select the highest-scored image attempt for that scene, run `approve-image` with its actual score/report, and advance even if the score is below `9`.
-7. Do not generate any WAN videos until every scene has a critic-approved or 30-attempt-selected Flux still, except when the user explicitly authorizes a one-off WAN test animation for a scene that already has an approved still. One-off tests must still be generated by `music-video-clip-maker`, must not be treated as opening the full video pass, and must not be approved as final unless/until the normal full still pass is complete.
+7. Do not generate any WAN videos until every scene has a critic-approved or 30-attempt-selected still, except when the user explicitly authorizes a one-off WAN test animation for a scene that already has an approved still. One-off tests must still be generated by `music-video-clip-maker`, must not be treated as opening the full video pass, and must not be approved as final unless/until the normal full still pass is complete.
 
 ### Phase 2 — video pass
 
 0. Optional user-authorized one-off test: before the full video pass, the user may explicitly request a single WAN test animation for a scene that already has an approved still. The clip-maker generates exactly one requested test attempt; the critic may inspect it for learning, but it must not be approved as final and the workflow must return to the still-image pass until all scenes have approved images.
-1. After all scenes have approved images, clip-maker generates one WAN video attempt for scene 1 from its approved image.
+1. After all scenes have approved images, the video maker selected in `plan.json` `generationMethods.imageToVideo` generates one image-to-video attempt for scene 1 from its approved image: default local WAN via `music-video-clip-maker`, or Grok Imagine via `grok-maker` only when explicitly selected.
 2. Critic extracts frames and scores the video 1-10. Reject videos with persistent white speckles/dots, snow-like flecks, salt-and-pepper artifacts, bright point-noise, or mosaic/block breakup across frames.
 3. If score is `8+`, critic approves the video and the workflow advances to the next scene.
-4. If score is below `8`, director revises the `videoPrompt` / `videoNegativePrompt`, clip-maker retries the same scene, and critic reviews again.
+4. If score is below `8`, director revises the `videoPrompt` / `videoNegativePrompt`, the selected video maker retries the same scene, and critic reviews again.
 5. Continue until every scene has an approved video.
 
 ### Phase 3 — per-clip polish pass
@@ -136,14 +168,26 @@ Example style only, not a default: for Harbor, the user liked an old-film/noir b
 
 When captions are requested, call `music-video-captioner` after remastering. If `output/<song>-remastered.mp4` exists, use that as the clean caption input and write a captioned sibling such as `output/<song>-remastered-captioned.mp4`. If no remaster exists, caption the clean final render directly.
 
+Before caption timing work, ask whether the user has an isolated vocals-only stem for the song. If one is available and time-identical to the final video/audio, use it as the primary WhisperX timing source. Mixed full-track audio can produce badly drifting word timings for sung vocals, especially in loud/repeated chorus sections. Displayed captions must still come from trusted/canonical lyrics, not raw WhisperX text.
+
+Caption timing rules learned from Freedom:
+
+1. Prefer full-song WhisperX `large-v3` on vocals-only audio when available; use mixed final audio only when no vocal stem exists.
+2. For dynamic word-by-word captions, use per-word timings for reveal timing and derive each ASS Dialogue event end from the last word reveal/end plus padding. Do not let old line windows clip the event before all word reveal tags fire.
+3. Repeated choruses need monotonic/section-aware lyric-to-timing alignment. If a section is suspect, rerun WhisperX on a short ±10s segment and/or on the vocal stem before manually interpolating.
+4. Ignore non-lyric WhisperX artifacts such as spurious outro words unless they appear in the trusted lyric script.
+5. Always visually review playback-representative frames/contact sheets around repeated choruses, breakdowns, and final choruses; JSON timing alone can look plausible while ASS animation still clips or drifts.
+
 ## Commands
 
 ```bash
 bun run video transcribe
 bun run plan
 bun run video image -- --scene 1 --attempt 1
+bun run scripts/register-web-image-attempt.ts -- --scene 1 --attempt 1 --image work/<song>/attempts/scene-0001/image-attempt-1.png
 bun run video approve-image -- --scene 1 --attempt 1 --score 9 --report "accepted image"
 bun run video clip -- --scene 1 --attempt 1
+bun run scripts/register-grok-video-attempt.ts -- --scene 1 --attempt 1 --clip work/<song>/attempts/scene-0001/grok-video-attempt-1.mp4 --image work/<song>/images/0001.png --post-url https://grok.com/imagine/post/<id>
 bun run video extract-frames -- --scene 1 --attempt 1
 bun run video approve -- --scene 1 --attempt 1 --score 8 --report "accepted video"
 bun run render -- --force
