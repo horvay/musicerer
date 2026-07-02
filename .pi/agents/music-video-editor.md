@@ -2,7 +2,6 @@
 name: music-video-editor
 description: Assembles approved/polished clips into the final 1080p music video
 tools: read, grep, find, ls, bash
-model: openai-codex/gpt-5.5
 thinkingLevel: low
 ---
 

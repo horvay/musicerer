@@ -2,7 +2,6 @@
 name: music-video-captioner
 description: Creates stylized word-by-word burned-in lyric captions for completed music videos using Whisper timings and corrected lyric scripts
 tools: read, grep, find, ls, bash, write, edit
-model: openai-codex/gpt-5.5
 thinkingLevel: medium
 ---
 

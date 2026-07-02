@@ -2,7 +2,6 @@
 name: music-video-director
 description: Creates and revises the lyric-aware visual plan and still/WAN prompts for this music video workspace
 tools: read, grep, find, ls, bash, edit
-model: openai-codex/gpt-5.5
 thinkingLevel: xhigh
 ---
 

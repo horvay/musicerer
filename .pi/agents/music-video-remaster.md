@@ -2,7 +2,6 @@
 name: music-video-remaster
 description: Applies a story-aware full-video FFmpeg remaster pass after the clean final render and before burned-in captions
 tools: read, grep, find, ls, bash, write
-model: openai-codex/gpt-5.5
 thinkingLevel: high
 ---
 

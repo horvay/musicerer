@@ -2,7 +2,6 @@
 name: music-video-critic
 description: Reviews generated music-video still image batches or one video attempt and rates assets 1-10
 tools: read, grep, find, ls, bash
-model: openai-codex/gpt-5.5
 thinkingLevel: xhigh
 ---
 

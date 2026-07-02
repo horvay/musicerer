@@ -2,7 +2,6 @@
 name: music-video-clip-maker
 description: Generates ComfyUI still batches or one video attempt for planned music-video scenes
 tools: read, grep, find, ls, bash
-model: openai-codex/gpt-5.5
 thinkingLevel: low
 ---
 

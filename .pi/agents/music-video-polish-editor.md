@@ -2,7 +2,6 @@
 name: music-video-polish-editor
 description: Uses FFmpeg to polish one approved scene clip at a time by inspecting frames, cropping/reframing, retiming, grading, repairing edges, and validating the result
 tools: read, grep, find, ls, bash, edit
-model: openai-codex/gpt-5.5
 thinkingLevel: high
 ---
 
